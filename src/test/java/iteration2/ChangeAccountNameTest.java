@@ -1,18 +1,19 @@
-package iteration1;
+package iteration2;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
@@ -96,10 +97,10 @@ public class ChangeAccountNameTest {
 
     @ParameterizedTest(name = "{displayName} {0}")
     @MethodSource("inValidData")
-    public void changeUsersNameWithInvalidDataTest(String testName, String name, String error) {
+    public void changeUsersNameWithInvalidDataTest(String testName, String name, String error) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
         String username = generate();
         String auth;
-
         auth = given()
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
@@ -135,7 +136,19 @@ public class ChangeAccountNameTest {
                 .response().getBody().asString();
         assertEquals(bodyError, error);
 
-
+        Response response = given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .header("Authorization", auth)
+                .when()
+                .get("http://localhost:4111/api/v1/customer/profile")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response();
+        JsonNode node = mapper.readTree(response.getBody().asString());
+        assertEquals(node.get("name").asText(), "null");
     }
 
 }

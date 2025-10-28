@@ -1,4 +1,4 @@
-package iteration1;
+package iteration2;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -270,10 +270,27 @@ public class DepositMoneyTest {
                 .response().
                 getBody().asString();
         assertEquals(bodyError, error);
+
+        JsonNode nodeForGetAccounts = objectMapper.readTree(given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .header("Authorization", auth)
+                .when(  )
+                .get("http://localhost:4111/api/v1/customer/accounts")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response().
+                getBody().asString());
+        assertEquals(nodeForGetAccounts.get(0).get("id").toString(), accountId);
+        assertEquals(Double.parseDouble(nodeForGetAccounts.get(0).get("balance").toString()), 0.0);
+        assertEquals(nodeForGetAccounts.get(0).get("transactions").size(), 0);
     }
 
     @Test
-    public void userDepositMoneyWithinValidAccountTest(){
+    public void userDepositMoneyWithinValidAccountTest() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
         String name = generate();
         String auth;
         auth = given()

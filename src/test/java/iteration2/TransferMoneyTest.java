@@ -1,4 +1,4 @@
-package iteration1;
+package iteration2;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 import static Utils.Common.generate;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TransferMoneyTest {
     @BeforeAll
@@ -410,7 +411,7 @@ public class TransferMoneyTest {
                 .assertThat()
                 .statusCode(HttpStatus.SC_OK);
 
-        String bodyError =given()
+        String bodyError = given()
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
                 .header("Authorization", auth)
@@ -518,6 +519,22 @@ public class TransferMoneyTest {
                 .response().getBody().asString();
         assertEquals(bodyError, error);
 
+        JsonNode nodeForGetAccounts = objectMapper.readTree(given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .header("Authorization", auth)
+                .when(  )
+                .get("http://localhost:4111/api/v1/customer/accounts")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response().
+                getBody().asString());
+        assertTrue((nodeForGetAccounts.get(0).get("balance").toString().equals("15000.0") ||
+                nodeForGetAccounts.get(1).get("balance").toString().equals("15000.0")) &&
+                (nodeForGetAccounts.get(0).get("balance").toString().equals("0.0") ||
+                nodeForGetAccounts.get(1).get("balance").toString().equals("0.0")));
     }
 
     @Test
@@ -605,7 +622,20 @@ public class TransferMoneyTest {
                 .statusCode(HttpStatus.SC_BAD_REQUEST).extract()
                 .response().getBody().asString();
         assertEquals(bodyError, "Invalid transfer: insufficient funds or invalid accounts");
+
+        JsonNode nodeForGetAccount = objectMapper.readTree(given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .header("Authorization", auth)
+                .when(  )
+                .get("http://localhost:4111/api/v1/customer/accounts")
+                .then()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .response().
+                getBody().asString());
+        assertEquals(Double.parseDouble(nodeForGetAccount.get(0).get("balance").toString()), 5000.0);
+        assertEquals(Double.parseDouble(nodeForGetAccount.get(1).get("balance").toString()), 0.0);
     }
-
-
 }
