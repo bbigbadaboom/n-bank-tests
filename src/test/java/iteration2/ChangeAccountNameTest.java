@@ -1,26 +1,26 @@
 package iteration2;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.restassured.RestAssured;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
-import org.apache.http.HttpStatus;
-import org.junit.jupiter.api.BeforeAll;
+import Models.CreateUserRequest;
+import Models.GetUserProfile;
+import Models.Roles;
+import Models.UserChangeNameRequest;
+import Requests.AdminCreateUserRequest;
+import Requests.UserChangeProfileNameRequest;
+import Requests.UserGetHisProfileRequest;
+import Specs.RequestSpecs;
+import Specs.ResponseSpecs;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import static Generates.Common.generateName;
+import static Generates.Common.generatePassword;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.List;
 import java.util.stream.Stream;
 
-import static Utils.Common.generate;
-import static io.restassured.RestAssured.given;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 public class ChangeAccountNameTest {
@@ -34,62 +34,34 @@ public class ChangeAccountNameTest {
         );
     }
 
-    @BeforeAll
-    public static void setupRestAssured() {
-        RestAssured.filters(
-                List.of(new RequestLoggingFilter(),
-                        new ResponseLoggingFilter())
-        );
-    }
-
     @Test
     public void changeUsersNameTest() {
-        String username = generate();
+        String name = generateName();
+        String pass = generatePassword(10);
         String auth;
-        auth = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", "Basic YWRtaW46YWRtaW4=")
-                .body("""
-                        {
-                          "username": "{userName}",
-                          "password": "Kate2000!"   ,
-                          "role": "USER"
-                        }""".replace("{userName}", username))
-                .when()
-                .post("http://localhost:4111/api/v1/admin/users")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_CREATED)
+        UserChangeNameRequest userChangeNameRequest = UserChangeNameRequest
+                .builder()
+                .name("New Name")
+                .build();
+        CreateUserRequest createUserRequest = CreateUserRequest
+                .builder()
+                .username(name)
+                .password(pass)
+                .role(Roles.USER.toString())
+                .build();
+        auth = new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
+                .post(createUserRequest)
                 .extract()
                 .header("Authorization");
 
-        String nameAfterChange = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", auth)
-                .body("""
-                        {
-                          "name": "New Name"
-                        }""")
-                .when()
-                .put("http://localhost:4111/api/v1/customer/profile")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK)
+        String nameAfterChange = new UserChangeProfileNameRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.getOkStatus())
+                .put(userChangeNameRequest)
                 .extract()
                 .response().jsonPath().get("customer.name").toString();
         assertEquals(nameAfterChange, "New Name");
 
-        String nameInProdileRequest = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", auth)
-                .when()
-                .get("http://localhost:4111/api/v1/customer/profile")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK)
+        String nameInProdileRequest = new UserGetHisProfileRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.getOkStatus())
+                .get()
                 .extract()
                 .response().jsonPath().get("name").toString();
         assertEquals(nameInProdileRequest, "New Name");
@@ -97,58 +69,36 @@ public class ChangeAccountNameTest {
 
     @ParameterizedTest(name = "{displayName} {0}")
     @MethodSource("inValidData")
-    public void changeUsersNameWithInvalidDataTest(String testName, String name, String error) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        String username = generate();
+    public void changeUsersNameWithInvalidDataTest(String testName, String name, String error) {
+        String username = generateName();
+        String pass = generatePassword(10);
         String auth;
-        auth = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", "Basic YWRtaW46YWRtaW4=")
-                .body("""
-                        {
-                          "username": "{userName}",
-                          "password": "Kate2000!"   ,
-                          "role": "USER"
-                        }""".replace("{userName}", username))
-                .when()
-                .post("http://localhost:4111/api/v1/admin/users")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_CREATED)
+        UserChangeNameRequest userChangeNameRequest = UserChangeNameRequest
+                .builder()
+                .name(name)
+                .build();
+        CreateUserRequest createUserRequest = CreateUserRequest
+                .builder()
+                .username(username)
+                .password(pass)
+                .role(Roles.USER.toString())
+                .build();
+        auth = new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
+                .post(createUserRequest)
                 .extract()
                 .header("Authorization");
 
-        String bodyError = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", auth)
-                .body("""
-                        {
-                          "name": "{name}"
-                        }""".replace("{name}", name))
-                .when()
-                .put("http://localhost:4111/api/v1/customer/profile")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_BAD_REQUEST)
+        String bodyError = new UserChangeProfileNameRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.getBadReqStatus())
+                .put(userChangeNameRequest)
                 .extract()
                 .response().getBody().asString();
         assertEquals(bodyError, error);
 
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", auth)
-                .when()
-                .get("http://localhost:4111/api/v1/customer/profile")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK)
+        GetUserProfile getUserProfile = new UserGetHisProfileRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.getOkStatus())
+                .get()
                 .extract()
-                .response();
-        JsonNode node = mapper.readTree(response.getBody().asString());
-        assertEquals(node.get("name").asText(), "null");
+                .response().as(GetUserProfile.class);
+        assertNull(getUserProfile.getName());
     }
 
 }
