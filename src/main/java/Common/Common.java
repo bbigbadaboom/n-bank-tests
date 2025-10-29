@@ -3,6 +3,7 @@ package Common;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Common {
     public static String generateName() {
@@ -42,6 +43,13 @@ public class Common {
             action.run();
         }
     }
+
+    public static int randomDouble(int first, int last) {
+
+        return
+                ThreadLocalRandom.current().nextInt(first, last);
+    }
+
 
 
 }

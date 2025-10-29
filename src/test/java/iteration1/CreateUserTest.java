@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -71,12 +72,11 @@ public class CreateUserTest {
                 () -> assertNotEquals(createUserResponse.getPassword(), pass),
                 () -> assertEquals(createUserResponse.getRole(), Roles.USER.toString())
         );
-        List<CreateUserResponse> users = new AdminGetAllUsersRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.getOkStatus())
-                .get().extract().response().jsonPath().getList("", CreateUserResponse.class);
+        List<CreateUserResponse> users = Arrays.asList((CreateUserResponse[])new AdminGetAllUsersRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.getOkStatus())
+                .get().extract().as(CreateUserResponse.class.arrayType()));
         List<String> userNames = users.stream().map(CreateUserResponse::getUsername).toList();
         assertTrue(userNames.contains(name));
     }
-
     @ParameterizedTest(name = "{displayName} {0}")
     @MethodSource("invalidData")
     public void adminCantCreateUserWithInvalidDataTest(String name, String username, String password, String role, String responseBody) {

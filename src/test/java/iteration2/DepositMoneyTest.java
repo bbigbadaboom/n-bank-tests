@@ -12,11 +12,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static Common.Common.generateName;
-import static Common.Common.generatePassword;
+import static Common.Common.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -69,10 +69,10 @@ public class DepositMoneyTest {
                 () -> assertEquals(depositMoneyResponse.getTransactions().get(0).getAmount(), amount)
         );
 
-        List<UserAccount> userAccountwithDeposit = new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
+        List<UserAccount> userAccountwithDeposit = Arrays.asList((UserAccount[])new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
                 .get()
                 .extract()
-                .response().jsonPath().getList("", UserAccount.class);
+                .as(UserAccount.class.arrayType()));
         assertAll(
                 () -> assertEquals(userAccountwithDeposit.get(0).getId(), accountId),
                 () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), amount),
@@ -84,8 +84,8 @@ public class DepositMoneyTest {
     public void userDepositMoneyWithValidDatawith2DepositsTest() {
         String name = generateName();
         String pass = generatePassword(10);
-        double firstAmount = 2000.0;
-        double secondAmount = 3000.0;
+        double firstAmount = randomDouble(1, 5001);
+        double secondAmount = randomDouble(1, 5001);
         CreateUserRequest createUserRequest = CreateUserRequest
                 .builder()
                 .username(name)
@@ -110,10 +110,9 @@ public class DepositMoneyTest {
         new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
                 .post(secondDepositMoneyRequest);
 
-        List<UserAccount> userAccountwithDeposit = new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
+        List<UserAccount> userAccountwithDeposit = Arrays.asList((UserAccount[])new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
                 .get()
-                .extract()
-                .response().jsonPath().getList("", UserAccount.class);
+                .extract().as(UserAccount.class.arrayType()));
         assertAll(
                 () -> assertEquals(userAccountwithDeposit.get(0).getId(), accountId),
                 () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), firstAmount + secondAmount),
@@ -144,10 +143,9 @@ public class DepositMoneyTest {
         new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getBadReqStatusWithMessage(error))
                 .post(firstDepositMoneyRequest);
 
-        List<UserAccount> userAccountwithDeposit = new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
+        List<UserAccount> userAccountwithDeposit = Arrays.asList((UserAccount[])new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
                 .get()
-                .extract()
-                .response().jsonPath().getList("", UserAccount.class);
+                .extract().as(UserAccount.class.arrayType()));
         assertAll(
                 () -> assertEquals(userAccountwithDeposit.get(0).getId(), accountId),
                 () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), 0.0),
@@ -159,8 +157,18 @@ public class DepositMoneyTest {
     public void userDepositMoneyWithinValidAccountTest() {
         String name = generateName();
         String pass = generatePassword(10);
+        double balance = randomDouble(1, 5001);
+        CreateUserRequest createUserRequest = CreateUserRequest
+                .builder()
+                .username(name)
+                .password(pass)
+                .role(Roles.USER.toString())
+                .build();
 
-        DepositMoneyRequest firstDepositMoneyRequest = DepositMoneyRequest.builder().id(10).balance(3000.0).build();
+        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
+                .post(createUserRequest).extract().as(CreateUserResponse.class);
+
+        DepositMoneyRequest firstDepositMoneyRequest = DepositMoneyRequest.builder().id(10).balance(balance).build();
         new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getForbiddenStatus())
                 .post(firstDepositMoneyRequest);
     }

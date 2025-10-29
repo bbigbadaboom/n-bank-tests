@@ -15,6 +15,7 @@ import static Common.Common.generateName;
 import static Common.Common.generatePassword;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -36,10 +37,9 @@ public class CreateAccountTest {
         new UserCreateAccountRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.entityCreated())
                 .post();
 
-        List<UserAccount> list = new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
+        List<UserAccount> list = Arrays.asList((UserAccount[])new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
                 .get()
-                .extract()
-                .response().jsonPath().getList("", UserAccount.class);
+                .extract().as(UserAccount.class.arrayType()));
         assertAll(
                 () -> assertEquals(list.get(0).getBalance(), 0.0),
                 () -> assertTrue(list.get(0).getTransactions().isEmpty())
