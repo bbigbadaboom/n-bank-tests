@@ -9,8 +9,8 @@ import Specs.RequestSpecs;
 import Specs.ResponseSpecs;
 import org.junit.jupiter.api.Test;
 
-import static Generates.Common.generateName;
-import static Generates.Common.generatePassword;
+import static Common.Common.generateName;
+import static Common.Common.generatePassword;
 
 public class LoginUserTest {
     @Test

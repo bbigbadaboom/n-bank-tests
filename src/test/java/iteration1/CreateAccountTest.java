@@ -11,8 +11,8 @@ import Specs.RequestSpecs;
 import Specs.ResponseSpecs;
 import org.junit.jupiter.api.Test;
 
-import static Generates.Common.generateName;
-import static Generates.Common.generatePassword;
+import static Common.Common.generateName;
+import static Common.Common.generatePassword;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;

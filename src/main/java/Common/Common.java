@@ -1,4 +1,4 @@
-package Generates;
+package Common;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -35,6 +35,12 @@ public class Common {
         }
 
         return password.toString();
+    }
+
+    public static void repeat(int times, Runnable action) {
+        for (int i = 0; i < times; i++) {
+            action.run();
+        }
     }
 
 

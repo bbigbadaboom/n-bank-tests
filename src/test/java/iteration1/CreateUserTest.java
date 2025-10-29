@@ -11,14 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 
-import static Generates.Common.generateName;
-import static Generates.Common.generatePassword;
+import static Common.Common.generateName;
+import static Common.Common.generatePassword;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 

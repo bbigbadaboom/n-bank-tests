@@ -17,8 +17,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static Generates.Common.generateName;
-import static Generates.Common.generatePassword;
+import static Common.Common.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TransferMoneyTest {
@@ -132,10 +131,10 @@ public class TransferMoneyTest {
 
         DepositMoneyRequest depositMoneyRequest = DepositMoneyRequest.builder().id(accountId).balance(5000.0).build();
 
-        for (int i = 0; i < 3; i++) {
+        repeat(3, () ->
             new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
-                    .post(depositMoneyRequest);
-        }
+                    .post(depositMoneyRequest));
+
 
         TransferMoneyRequest transferMoneyRequest = TransferMoneyRequest
                 .builder()
@@ -263,10 +262,10 @@ public class TransferMoneyTest {
 
         DepositMoneyRequest depositMoneyRequest = DepositMoneyRequest.builder().id(accountId).balance(5000).build();
 
-        for (int i = 0; i < 3; i++) {
-            new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
-                    .post(depositMoneyRequest);
-        }
+
+        repeat(3, () -> new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
+                    .post(depositMoneyRequest));
+
 
         TransferMoneyRequest transferMoneyRequest = TransferMoneyRequest
                 .builder()
