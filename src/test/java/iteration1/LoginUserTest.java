@@ -2,6 +2,7 @@ package iteration1;
 
 import Models.CreateUserRequest;
 import Models.LoginUserRequest;
+import Models.Roles;
 import Requests.AdminCreateUserRequest;
 import Requests.AdminLoginUserRequest;
 import Specs.RequestSpecs;
@@ -32,8 +33,9 @@ public class LoginUserTest {
                 .builder()
                 .username(name)
                 .password(pass)
-                .role("USER")
+                .role(Roles.USER.toString())
                 .build();
+
 
         LoginUserRequest loginUserRequest = LoginUserRequest
                 .builder()

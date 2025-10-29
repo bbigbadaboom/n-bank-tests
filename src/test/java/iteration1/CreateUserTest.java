@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
@@ -71,9 +72,10 @@ public class CreateUserTest {
                 () -> assertNotEquals(createUserResponse.getPassword(), pass),
                 () -> assertEquals(createUserResponse.getRole(), Roles.USER.toString())
         );
-        List<String> usernames = new AdminGetAllUsersRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.getOkStatus())
-                .get().extract().response().jsonPath().getList("username");
-        assertTrue(usernames.contains(name));
+        List<CreateUserResponse> users = new AdminGetAllUsersRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.getOkStatus())
+                .get().extract().response().jsonPath().getList("", CreateUserResponse.class);
+        List<String> userNames = users.stream().map(CreateUserResponse::getUsername).toList();
+        assertTrue(userNames.contains(name));
     }
 
     @ParameterizedTest(name = "{displayName} {0}")
@@ -86,10 +88,8 @@ public class CreateUserTest {
                 .password(password)
                 .role(role)
                 .build();
-
-        String body = new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.getBadReqStatus())
-                .post(createUserRequest).extract().response().getBody().asString();
-        assertEquals(body, responseBody);
+        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.getBadReqStatusWithMessage(responseBody))
+                .post(createUserRequest);
     }
 
     @Test

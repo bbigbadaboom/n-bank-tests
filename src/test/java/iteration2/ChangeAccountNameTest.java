@@ -1,9 +1,6 @@
 package iteration2;
 
-import Models.CreateUserRequest;
-import Models.GetUserProfile;
-import Models.Roles;
-import Models.UserChangeNameRequest;
+import Models.*;
 import Requests.AdminCreateUserRequest;
 import Requests.UserChangeProfileNameRequest;
 import Requests.UserGetHisProfileRequest;
@@ -38,7 +35,6 @@ public class ChangeAccountNameTest {
     public void changeUsersNameTest() {
         String name = generateName();
         String pass = generatePassword(10);
-        String auth;
         UserChangeNameRequest userChangeNameRequest = UserChangeNameRequest
                 .builder()
                 .name("New Name")
@@ -49,22 +45,21 @@ public class ChangeAccountNameTest {
                 .password(pass)
                 .role(Roles.USER.toString())
                 .build();
-        auth = new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
-                .post(createUserRequest)
-                .extract()
-                .header("Authorization");
 
-        String nameAfterChange = new UserChangeProfileNameRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.getOkStatus())
+        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
+                .post(createUserRequest).extract().as(CreateUserResponse.class);
+
+        UserChangeNameResponse userChangeNameResponse = new UserChangeProfileNameRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
                 .put(userChangeNameRequest)
                 .extract()
-                .response().jsonPath().get("customer.name").toString();
-        assertEquals(nameAfterChange, "New Name");
+                .response().as(UserChangeNameResponse.class);
+        assertEquals(userChangeNameResponse.getCustomer().getName(), "New Name");
 
-        String nameInProdileRequest = new UserGetHisProfileRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.getOkStatus())
+        UserGetHisAccountResponse customer = new UserGetHisProfileRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
                 .get()
                 .extract()
-                .response().jsonPath().get("name").toString();
-        assertEquals(nameInProdileRequest, "New Name");
+                .response().as(UserGetHisAccountResponse.class);
+        assertEquals(customer.getName(), "New Name");
     }
 
     @ParameterizedTest(name = "{displayName} {0}")
@@ -72,7 +67,6 @@ public class ChangeAccountNameTest {
     public void changeUsersNameWithInvalidDataTest(String testName, String name, String error) {
         String username = generateName();
         String pass = generatePassword(10);
-        String auth;
         UserChangeNameRequest userChangeNameRequest = UserChangeNameRequest
                 .builder()
                 .name(name)
@@ -83,18 +77,14 @@ public class ChangeAccountNameTest {
                 .password(pass)
                 .role(Roles.USER.toString())
                 .build();
-        auth = new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
-                .post(createUserRequest)
-                .extract()
-                .header("Authorization");
 
-        String bodyError = new UserChangeProfileNameRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.getBadReqStatus())
-                .put(userChangeNameRequest)
-                .extract()
-                .response().getBody().asString();
-        assertEquals(bodyError, error);
+        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
+                .post(createUserRequest).extract().as(CreateUserResponse.class);
 
-        GetUserProfile getUserProfile = new UserGetHisProfileRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.getOkStatus())
+        new UserChangeProfileNameRequest(RequestSpecs.userAuthSpec(username, pass), ResponseSpecs.getBadReqStatusWithMessage(error))
+                .put(userChangeNameRequest);
+
+        GetUserProfile getUserProfile = new UserGetHisProfileRequest(RequestSpecs.userAuthSpec(username, pass), ResponseSpecs.getOkStatus())
                 .get()
                 .extract()
                 .response().as(GetUserProfile.class);

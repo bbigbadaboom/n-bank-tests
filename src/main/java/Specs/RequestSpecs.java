@@ -1,8 +1,10 @@
 package Specs;
 
+import Models.BaseModel;
 import Models.CreateUserRequest;
 import Models.Roles;
 import Requests.AdminCreateUserRequest;
+import Requests.AdminLoginUserRequest;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
@@ -31,8 +33,17 @@ public class RequestSpecs {
         .build();
     }
 
-    public static RequestSpecification userAuthSpec(String auth){
-        return defaultRequestBuilder().addHeader("Authorization", auth)
+    public static RequestSpecification userAuthSpec(String name, String pass){
+        CreateUserRequest loginUserRequest = CreateUserRequest
+                .builder()
+                .username(name)
+                .password(pass)
+                .build();
+        String token = new AdminLoginUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.getOkStatus())
+                .post(loginUserRequest)
+                .extract()
+                .header("Authorization");
+        return  defaultRequestBuilder().addHeader("Authorization", token)
                 .build();
     }
 }

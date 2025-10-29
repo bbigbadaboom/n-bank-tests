@@ -43,24 +43,22 @@ public class DepositMoneyTest {
     public void userDepositMoneyWithValidDataTest(String testName, Double amount){
         String name = generateName();
         String pass = generatePassword(10);
-        String auth;
         CreateUserRequest createUserRequest = CreateUserRequest
                 .builder()
                 .username(name)
                 .password(pass)
                 .role(Roles.USER.toString())
                 .build();
-        auth = new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
-                .post(createUserRequest)
-                .extract()
-                .header("Authorization");
 
-        UserAccount userAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.entityCreated())
+        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
+                .post(createUserRequest).extract().as(CreateUserResponse.class);
+
+        UserAccount userAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.entityCreated())
                 .post().extract().response().as(UserAccount.class);
         int accountId = userAccount.getId();
         DepositMoneyRequest depositMoneyRequest = DepositMoneyRequest.builder().id(accountId).balance(amount).build();
 
-        DepositMoneyResponse depositMoneyResponse = new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.getOkStatus())
+        DepositMoneyResponse depositMoneyResponse = new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
                 .post(depositMoneyRequest)
                 .extract()
                 .response().as(DepositMoneyResponse.class);
@@ -71,7 +69,7 @@ public class DepositMoneyTest {
                 () -> assertEquals(depositMoneyResponse.getTransactions().get(0).getAmount(), amount)
         );
 
-        List<UserAccount> userAccountwithDeposit = new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.getOkStatus())
+        List<UserAccount> userAccountwithDeposit = new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
                 .get()
                 .extract()
                 .response().jsonPath().getList("", UserAccount.class);
@@ -88,33 +86,31 @@ public class DepositMoneyTest {
         String pass = generatePassword(10);
         double firstAmount = 2000.0;
         double secondAmount = 3000.0;
-        String auth;
         CreateUserRequest createUserRequest = CreateUserRequest
                 .builder()
                 .username(name)
                 .password(pass)
                 .role(Roles.USER.toString())
                 .build();
-        auth = new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
-                .post(createUserRequest)
-                .extract()
-                .header("Authorization");
 
-        UserAccount userAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.entityCreated())
+        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
+                .post(createUserRequest).extract().as(CreateUserResponse.class);
+
+        UserAccount userAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.entityCreated())
                 .post().extract().response().as(UserAccount.class);
 
         int accountId = userAccount.getId();
         DepositMoneyRequest firstDepositMoneyRequest = DepositMoneyRequest.builder().id(accountId).balance(firstAmount).build();
 
-        new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.getOkStatus())
+        new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
                 .post(firstDepositMoneyRequest);
 
         DepositMoneyRequest secondDepositMoneyRequest = DepositMoneyRequest.builder().id(accountId).balance(secondAmount).build();
 
-        new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.getOkStatus())
+        new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
                 .post(secondDepositMoneyRequest);
 
-        List<UserAccount> userAccountwithDeposit = new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.getOkStatus())
+        List<UserAccount> userAccountwithDeposit = new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
                 .get()
                 .extract()
                 .response().jsonPath().getList("", UserAccount.class);
@@ -130,31 +126,25 @@ public class DepositMoneyTest {
     public void userDepositMoneyWithinValidBalanceDataTest(String testName, Double amount, String error) {
         String name = generateName();
         String pass = generatePassword(10);
-        String auth;
         CreateUserRequest createUserRequest = CreateUserRequest
                 .builder()
                 .username(name)
                 .password(pass)
                 .role(Roles.USER.toString())
                 .build();
-        auth = new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
-                .post(createUserRequest)
-                .extract()
-                .header("Authorization");
 
-        UserAccount userAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.entityCreated())
+        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
+                .post(createUserRequest).extract().as(CreateUserResponse.class);
+
+        UserAccount userAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.entityCreated())
                 .post().extract().response().as(UserAccount.class);
 
         int accountId = userAccount.getId();
         DepositMoneyRequest firstDepositMoneyRequest = DepositMoneyRequest.builder().id(accountId).balance(amount).build();
-        String bodyError = new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.getBadReqStatus())
-                .post(firstDepositMoneyRequest)
-                .extract()
-                .response().
-                getBody().asString();
-        assertEquals(bodyError, error);
+        new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getBadReqStatusWithMessage(error))
+                .post(firstDepositMoneyRequest);
 
-        List<UserAccount> userAccountwithDeposit = new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.getOkStatus())
+        List<UserAccount> userAccountwithDeposit = new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
                 .get()
                 .extract()
                 .response().jsonPath().getList("", UserAccount.class);
@@ -169,20 +159,9 @@ public class DepositMoneyTest {
     public void userDepositMoneyWithinValidAccountTest() {
         String name = generateName();
         String pass = generatePassword(10);
-        String auth;
-        CreateUserRequest createUserRequest = CreateUserRequest
-                .builder()
-                .username(name)
-                .password(pass)
-                .role(Roles.USER.toString())
-                .build();
-        auth = new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
-                .post(createUserRequest)
-                .extract()
-                .header("Authorization");
 
         DepositMoneyRequest firstDepositMoneyRequest = DepositMoneyRequest.builder().id(10).balance(3000.0).build();
-        new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(auth), ResponseSpecs.getForbiddenStatus())
+        new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getForbiddenStatus())
                 .post(firstDepositMoneyRequest);
     }
 

@@ -11,8 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateUserResponse extends BaseModel {
-    private long id;
+public class UserGetHisAccountResponse extends BaseModel {
+    private int id;
     private String username;
     private String password;
     private String name;

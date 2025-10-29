@@ -16,7 +16,7 @@ public class Common {
         String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         String lower = "abcdefghijklmnopqrstuvwxyz";
         String digits = "0123456789";
-        String special = "!@#$%^&*";
+        String special = "!@#$%^&";
 
         String all = upper + lower + digits + special;
 
