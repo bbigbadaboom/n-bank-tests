@@ -1,80 +1,49 @@
 package iteration1;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.restassured.RestAssured;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
-import io.restassured.http.ContentType;
-import org.apache.http.HttpStatus;
-import org.junit.jupiter.api.BeforeAll;
+import Models.CreateUserRequest;
+import Models.CreateUserResponse;
+import Models.Roles;
+import Models.UserAccount;
+import Requests.AdminCreateUserRequest;
+import Requests.UserCreateAccountRequest;
+import Requests.UserGetHisAccountsRequest;
+import Specs.RequestSpecs;
+import Specs.ResponseSpecs;
 import org.junit.jupiter.api.Test;
 
+import static Common.Common.generateName;
+import static Common.Common.generatePassword;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Arrays;
 import java.util.List;
 
-import static Utils.Common.generate;
-import static io.restassured.RestAssured.given;
 
 public class CreateAccountTest {
-
-    @BeforeAll
-    public static void setupRestAssured() {
-        RestAssured.filters(
-                List.of(new RequestLoggingFilter(),
-                        new ResponseLoggingFilter())
-        );
-    }
-
     @Test
-    public void createUserAccountTest() throws JsonProcessingException {
-        String name = generate();
-        ObjectMapper objectMapper = new ObjectMapper();
-        String auth;
-        auth = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", "Basic YWRtaW46YWRtaW4=")
-                .body("""
-                        {
-                          "username": "{userName}",
-                          "password": "Kate2000!"   ,
-                          "role": "USER"
-                        }""".replace("{userName}", name))
-                .when()
-                .post("http://localhost:4111/api/v1/admin/users")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_CREATED)
-                .extract()
-                .header("Authorization");
+    public void createUserAccountTest() {
+        String name = generateName();
+        String pass = generatePassword(10);
+        CreateUserRequest createUserRequest = CreateUserRequest
+                .builder()
+                .username(name)
+                .password(pass)
+                .role(Roles.USER.toString())
+                .build();
 
-        given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", auth)
-                .when()
-                .post("http://localhost:4111/api/v1/accounts")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_CREATED);
+        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
+                .post(createUserRequest).extract().as(CreateUserResponse.class);
 
-        JsonNode body = objectMapper.readTree(given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", auth)
-                .when()
-                .get("http://localhost:4111/api/v1/customer/accounts")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK)
-                .extract()
-                .response().
-                getBody().asString());
-        assertEquals(body.get(0).get("balance").toString(), "0.0");
-        assertTrue(body.get(0).get("transactions").isEmpty());
+        new UserCreateAccountRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.entityCreated())
+                .post();
+
+        List<UserAccount> list = Arrays.asList((UserAccount[])new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
+                .get()
+                .extract().as(UserAccount.class.arrayType()));
+        assertAll(
+                () -> assertEquals(list.get(0).getBalance(), 0.0),
+                () -> assertTrue(list.get(0).getTransactions().isEmpty())
+        );
     }
 }
 

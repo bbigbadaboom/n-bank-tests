@@ -1,332 +1,176 @@
 package iteration2;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.restassured.RestAssured;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
-import org.apache.http.HttpStatus;
-import org.junit.jupiter.api.BeforeAll;
+import Models.*;
+import Requests.AdminCreateUserRequest;
+import Requests.UserCreateAccountRequest;
+import Requests.UserDepositMoneyRequest;
+import Requests.UserGetHisAccountsRequest;
+import Specs.RequestSpecs;
+import Specs.ResponseSpecs;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static Utils.Common.generate;
-import static io.restassured.RestAssured.given;
+import static Common.Common.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DepositMoneyTest {
     private static Stream<Arguments> validData() {
         return Stream.of(
-                Arguments.of("0.01 deposit", "0.01"),
-                Arguments.of("5000 deposit", "5000"),
-                Arguments.of("4999.99 deposit", "4999.99")
+                Arguments.of("0.01 deposit", 0.01),
+                Arguments.of("5000 deposit", 5000.0),
+                Arguments.of("4999.99 deposit", 4999.99)
 
         );
     }
+
     private static Stream<Arguments> inValidBalanceData() {
         return Stream.of(
                 Arguments.of("balance more than 5000", "5000.01", "Deposit amount cannot exceed 5000"),
                 Arguments.of("balance 0", "0", "Deposit amount must be at least 0.01"),
-                Arguments.of("balance -0.01", "-0.01", "Deposit amount must be at least 0.01"),
-                Arguments.of("balance 5001", "5001", "Deposit amount cannot exceed 5000")
-        );
-    }
-    @BeforeAll
-    public static void setupRestAssured() {
-        RestAssured.filters(
-                List.of(new RequestLoggingFilter(),
-                        new ResponseLoggingFilter())
+                Arguments.of("balance -0.01", "-0.01", "Deposit amount must be at least 0.01")
         );
     }
 
-    @ParameterizedTest(name="{displayName} {0}")
+    @ParameterizedTest(name = "{displayName} {0}")
     @MethodSource("validData")
-    public void userDepositMoneyWithValidDataTest(String testName, String amount) throws JsonProcessingException {
-        String name = generate();
-        ObjectMapper objectMapper = new ObjectMapper();
-        String auth;
-        String accountId;
-        auth = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", "Basic YWRtaW46YWRtaW4=")
-                .body("""
-                        {
-                          "username": "{userName}",
-                          "password": "Kate2000!"   ,
-                          "role": "USER"
-                        }""".replace("{userName}", name))
-                .when()
-                .post("http://localhost:4111/api/v1/admin/users")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_CREATED)
+    public void userDepositMoneyWithValidDataTest(String testName, Double amount){
+        String name = generateName();
+        String pass = generatePassword(10);
+        CreateUserRequest createUserRequest = CreateUserRequest
+                .builder()
+                .username(name)
+                .password(pass)
+                .role(Roles.USER.toString())
+                .build();
+
+        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
+                .post(createUserRequest).extract().as(CreateUserResponse.class);
+
+        UserAccount userAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.entityCreated())
+                .post().extract().response().as(UserAccount.class);
+        int accountId = userAccount.getId();
+        DepositMoneyRequest depositMoneyRequest = DepositMoneyRequest.builder().id(accountId).balance(amount).build();
+
+        DepositMoneyResponse depositMoneyResponse = new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
+                .post(depositMoneyRequest)
                 .extract()
-                        .response()
-                .header("Authorization");
+                .response().as(DepositMoneyResponse.class);
+        assertAll(
+                () -> assertEquals(depositMoneyResponse.getId(), accountId),
+                () -> assertEquals(depositMoneyResponse.getBalance(), amount),
+                () -> assertEquals(depositMoneyResponse.getTransactions().get(0).getType(), "DEPOSIT"),
+                () -> assertEquals(depositMoneyResponse.getTransactions().get(0).getAmount(), amount)
+        );
 
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", auth)
-                .when()
-                .post("http://localhost:4111/api/v1/accounts")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_CREATED)
-                .extract().response();
-
-        JsonNode body = objectMapper.readTree(response.getBody().asString());
-        accountId = body.get("id").asText();
-
-        JsonNode nodeForDeposit = objectMapper.readTree(given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", auth)
-                .body("""
-                        {
-                           "id": {id},
-                           "balance": {balance} 
-                         }""".replace("{id}", accountId).replace("{balance}", amount))
-                .when()
-                .post("http://localhost:4111/api/v1/accounts/deposit")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK).extract()
-                .response().
-                getBody().asString());
-        assertEquals(nodeForDeposit.get("id").toString(), accountId);
-        assertEquals(Double.parseDouble(nodeForDeposit.get("balance").toString()), Double.parseDouble(amount));
-        assertEquals(nodeForDeposit.get("transactions").get(0).get("type").asText(), "DEPOSIT");
-        assertEquals(Double.parseDouble(nodeForDeposit.get("transactions").get(0).get("amount").asText()), Double.parseDouble(amount));
-
-        JsonNode nodeForGetAccounts = objectMapper.readTree(given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", auth)
-                .when(  )
-                .get("http://localhost:4111/api/v1/customer/accounts")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK)
+        List<UserAccount> userAccountwithDeposit = Arrays.asList((UserAccount[])new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
+                .get()
                 .extract()
-                .response().
-                getBody().asString());
-        assertEquals(nodeForGetAccounts.get(0).get("id").toString(), accountId);
-        assertEquals(Double.parseDouble(nodeForGetAccounts.get(0).get("balance").toString()), Double.parseDouble(amount));
-        assertEquals(nodeForGetAccounts.get(0).get("transactions").size(), 1);
+                .as(UserAccount.class.arrayType()));
+        assertAll(
+                () -> assertEquals(userAccountwithDeposit.get(0).getId(), accountId),
+                () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), amount),
+                () -> assertEquals(userAccountwithDeposit.get(0).getTransactions().size(), 1)
+        );
     }
 
     @Test
-    public void userDepositMoneyWithValidDatawith2DepositsTest() throws JsonProcessingException {
-        String name = generate();
-        ObjectMapper objectMapper = new ObjectMapper();
-        String auth;
-        String accountId;
-        String firstAmount = "2000";
-        String secondAmount = "3000";
-        auth = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", "Basic YWRtaW46YWRtaW4=")
-                .body("""
-                        {
-                          "username": "{userName}",
-                          "password": "Kate2000!"   ,
-                          "role": "USER"
-                        }""".replace("{userName}", name))
-                .when()
-                .post("http://localhost:4111/api/v1/admin/users")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_CREATED)
-                .extract()
-                .response()
-                .header("Authorization");
+    public void userDepositMoneyWithValidDatawith2DepositsTest() {
+        String name = generateName();
+        String pass = generatePassword(10);
+        double firstAmount = randomDouble(1, 5001);
+        double secondAmount = randomDouble(1, 5001);
+        CreateUserRequest createUserRequest = CreateUserRequest
+                .builder()
+                .username(name)
+                .password(pass)
+                .role(Roles.USER.toString())
+                .build();
 
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", auth)
-                .when()
-                .post("http://localhost:4111/api/v1/accounts")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_CREATED)
-                .extract().response();
+        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
+                .post(createUserRequest).extract().as(CreateUserResponse.class);
 
-        JsonNode body = objectMapper.readTree(response.getBody().asString());
-        accountId = body.get("id").asText();
+        UserAccount userAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.entityCreated())
+                .post().extract().response().as(UserAccount.class);
 
-        given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", auth)
-                .body("""
-                        {
-                           "id": {id},
-                           "balance": {balance} 
-                         }""".replace("{id}", accountId).replace("{balance}", firstAmount))
-                .when()
-                .post("http://localhost:4111/api/v1/accounts/deposit")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK);
-        given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", auth)
-                .body("""
-                        {
-                           "id": {id},
-                           "balance": {balance} 
-                         }""".replace("{id}", accountId).replace("{balance}", secondAmount))
-                .when()
-                .post("http://localhost:4111/api/v1/accounts/deposit")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK);
+        int accountId = userAccount.getId();
+        DepositMoneyRequest firstDepositMoneyRequest = DepositMoneyRequest.builder().id(accountId).balance(firstAmount).build();
 
-        JsonNode nodeForGetAccounts = objectMapper.readTree(given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", auth)
-                .when(  )
-                .get("http://localhost:4111/api/v1/customer/accounts")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK)
-                .extract()
-                .response().
-                getBody().asString());
-        assertEquals(nodeForGetAccounts.get(0).get("id").toString(), accountId);
-        assertEquals(Double.parseDouble(nodeForGetAccounts.get(0).get("balance").toString()),
-                Double.parseDouble(firstAmount) + Double.parseDouble(secondAmount));
-        assertEquals(nodeForGetAccounts.get(0).get("transactions").size(), 2);
+        new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
+                .post(firstDepositMoneyRequest);
+
+        DepositMoneyRequest secondDepositMoneyRequest = DepositMoneyRequest.builder().id(accountId).balance(secondAmount).build();
+
+        new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
+                .post(secondDepositMoneyRequest);
+
+        List<UserAccount> userAccountwithDeposit = Arrays.asList((UserAccount[])new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
+                .get()
+                .extract().as(UserAccount.class.arrayType()));
+        assertAll(
+                () -> assertEquals(userAccountwithDeposit.get(0).getId(), accountId),
+                () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), firstAmount + secondAmount),
+                () -> assertEquals(userAccountwithDeposit.get(0).getTransactions().size(), 2)
+        );
     }
 
     @ParameterizedTest(name="{displayName} {0}")
     @MethodSource("inValidBalanceData")
-    public void userDepositMoneyWithinValidBalanceDataTest(String testName, String amount, String error) throws JsonProcessingException {
-        String name = generate();
-        ObjectMapper objectMapper = new ObjectMapper();
-        String auth;
-        auth = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", "Basic YWRtaW46YWRtaW4=")
-                .body("""
-                        {
-                          "username": "{userName}",
-                          "password": "Kate2000!"   ,
-                          "role": "USER"
-                        }""".replace("{userName}", name))
-                .when()
-                .post("http://localhost:4111/api/v1/admin/users")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_CREATED)
-                .extract()
-                .response()
-                .header("Authorization");
+    public void userDepositMoneyWithinValidBalanceDataTest(String testName, Double amount, String error) {
+        String name = generateName();
+        String pass = generatePassword(10);
+        CreateUserRequest createUserRequest = CreateUserRequest
+                .builder()
+                .username(name)
+                .password(pass)
+                .role(Roles.USER.toString())
+                .build();
 
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", auth)
-                .when()
-                .post("http://localhost:4111/api/v1/accounts")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_CREATED)
-                .extract().response();
+        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
+                .post(createUserRequest).extract().as(CreateUserResponse.class);
 
-        JsonNode body = objectMapper.readTree(response.getBody().asString());
-        String accountId = body.get("id").asText();
+        UserAccount userAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.entityCreated())
+                .post().extract().response().as(UserAccount.class);
 
+        int accountId = userAccount.getId();
+        DepositMoneyRequest firstDepositMoneyRequest = DepositMoneyRequest.builder().id(accountId).balance(amount).build();
+        new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getBadReqStatusWithMessage(error))
+                .post(firstDepositMoneyRequest);
 
-        String bodyError = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", auth)
-                .body("""
-                        {
-                           "id": {id},
-                           "balance": {balance} 
-                         }""".replace("{id}", accountId).replace("{balance}", amount))
-                .when()
-                .post("http://localhost:4111/api/v1/accounts/deposit")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_BAD_REQUEST).extract()
-                .response().
-                getBody().asString();
-        assertEquals(bodyError, error);
-
-        JsonNode nodeForGetAccounts = objectMapper.readTree(given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", auth)
-                .when(  )
-                .get("http://localhost:4111/api/v1/customer/accounts")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK)
-                .extract()
-                .response().
-                getBody().asString());
-        assertEquals(nodeForGetAccounts.get(0).get("id").toString(), accountId);
-        assertEquals(Double.parseDouble(nodeForGetAccounts.get(0).get("balance").toString()), 0.0);
-        assertEquals(nodeForGetAccounts.get(0).get("transactions").size(), 0);
+        List<UserAccount> userAccountwithDeposit = Arrays.asList((UserAccount[])new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
+                .get()
+                .extract().as(UserAccount.class.arrayType()));
+        assertAll(
+                () -> assertEquals(userAccountwithDeposit.get(0).getId(), accountId),
+                () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), 0.0),
+                () -> assertEquals(userAccountwithDeposit.get(0).getTransactions().size(), 0)
+        );
     }
 
     @Test
-    public void userDepositMoneyWithinValidAccountTest() throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String name = generate();
-        String auth;
-        auth = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", "Basic YWRtaW46YWRtaW4=")
-                .body("""
-                        {
-                          "username": "{userName}",
-                          "password": "Kate2000!"   ,
-                          "role": "USER"
-                        }""".replace("{userName}", name))
-                .when()
-                .post("http://localhost:4111/api/v1/admin/users")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_CREATED)
-                .extract()
-                .response()
-                .header("Authorization");
+    public void userDepositMoneyWithinValidAccountTest() {
+        String name = generateName();
+        String pass = generatePassword(10);
+        double balance = randomDouble(1, 5001);
+        CreateUserRequest createUserRequest = CreateUserRequest
+                .builder()
+                .username(name)
+                .password(pass)
+                .role(Roles.USER.toString())
+                .build();
 
-        given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", auth)
-                .body("""
-                        {
-                           "id": "10,
-                           "balance": 3000
-                         }""")
-                .when()
-                .post("http://localhost:4111/api/v1/accounts/deposit")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_BAD_REQUEST);
+        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
+                .post(createUserRequest).extract().as(CreateUserResponse.class);
+
+        DepositMoneyRequest firstDepositMoneyRequest = DepositMoneyRequest.builder().id(10).balance(balance).build();
+        new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getForbiddenStatus())
+                .post(firstDepositMoneyRequest);
     }
-
 
 }

@@ -1,29 +1,31 @@
 package iteration1;
 
-import io.restassured.RestAssured;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
-import io.restassured.http.ContentType;
-import org.apache.http.HttpStatus;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeAll;
+import Models.CreateUserRequest;
+import Models.CreateUserResponse;
+import Models.Roles;
+import Requests.AdminCreateUserRequest;
+import Requests.AdminGetAllUsersRequest;
+import Specs.RequestSpecs;
+import Specs.ResponseSpecs;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 
-import static Utils.Common.generate;
+import static Common.Common.generateName;
+import static Common.Common.generatePassword;
 import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static io.restassured.RestAssured.given;
 
 public class CreateUserTest {
     private static Stream<Arguments> invalidData() {
         return Stream.of(
-                Arguments.of("blank username", "     ",  "Kate1998@", "USER",
+                Arguments.of("blank username", "     ", "Kate1998@", "USER",
                         "{\"username\":[\"Username must contain only letters, digits, dashes, underscores, and dots\"," +
                                 "\"Username cannot be blank\"]}"),
                 Arguments.of("2 letters username", "ka", "Kate1998@", "USER", """
@@ -51,111 +53,61 @@ public class CreateUserTest {
 
         );
     }
-    @BeforeAll
-    public static void setupRestAssured() {
-        RestAssured.filters(
-                List.of(new RequestLoggingFilter(),
-                        new ResponseLoggingFilter())
-        );
-    }
 
     @Test
     public void adminCanCreateUserWithCorrectDataTest() {
-        String name = generate();
+        String name = generateName();
+        String pass = generatePassword(10);
+        CreateUserRequest createUserRequest = CreateUserRequest
+                .builder()
+                .username(name)
+                .password(pass)
+                .role(Roles.USER.toString())
+                .build();
 
-        given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", "Basic YWRtaW46YWRtaW4=")
-                .body("""
-                        {
-                          "username": "{userName}",
-                          "password": "Kate2000!"   ,
-                          "role": "USER"
-                        }""".replace("{userName}", name))
-                .when()
-                .post("http://localhost:4111/api/v1/admin/users")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_CREATED)
-                .body("username", Matchers.equalTo(name))
-                .body("password", Matchers.not(Matchers.equalTo("Kate2000!")))
-                .body("role", Matchers.equalTo("USER"));
-
-        List<String> usernames = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", "Basic YWRtaW46YWRtaW4=")
-                .when()
-                .get("http://localhost:4111/api/v1/admin/users")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK)
-                 .extract().response().jsonPath().getList("username");
-        assertTrue(usernames.contains(name));
+        CreateUserResponse createUserResponse = new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
+                .post(createUserRequest).extract().as(CreateUserResponse.class);
+        assertAll(
+                () -> assertEquals(createUserResponse.getUsername(), name),
+                () -> assertNotEquals(createUserResponse.getPassword(), pass),
+                () -> assertEquals(createUserResponse.getRole(), Roles.USER.toString())
+        );
+        List<CreateUserResponse> users = Arrays.asList((CreateUserResponse[])new AdminGetAllUsersRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.getOkStatus())
+                .get().extract().as(CreateUserResponse.class.arrayType()));
+        List<String> userNames = users.stream().map(CreateUserResponse::getUsername).toList();
+        assertTrue(userNames.contains(name));
     }
-
-    @ParameterizedTest(name="{displayName} {0}")
+    @ParameterizedTest(name = "{displayName} {0}")
     @MethodSource("invalidData")
     public void adminCantCreateUserWithInvalidDataTest(String name, String username, String password, String role, String responseBody) {
-        String requestBody =String.format("""
-                        {
-                          "username": "%s",
-                          "password": "%s"   ,
-                          "role": "%s"
-                        }""", username, password, role );
 
-        given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", "Basic YWRtaW46YWRtaW4=")
-                .body(requestBody)
-                .when()
-                .post("http://localhost:4111/api/v1/admin/users")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_BAD_REQUEST)
-                .body(Matchers.equalTo(responseBody));
+        CreateUserRequest createUserRequest = CreateUserRequest
+                .builder()
+                .username(username)
+                .password(password)
+                .role(role)
+                .build();
+        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.getBadReqStatusWithMessage(responseBody))
+                .post(createUserRequest);
     }
 
     @Test
     public void adminCanCreateUserWithCorrectDataButWithExistedUsernameTest() {
-        String name = generate();
-        String errorMessage;
+        String name = generateName();
+        String pass = generatePassword(10);
+        CreateUserRequest createUserRequest = CreateUserRequest
+                .builder()
+                .username(name)
+                .password(pass)
+                .role(Roles.USER.toString())
+                .build();
 
-        given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", "Basic YWRtaW46YWRtaW4=")
-                .body("""
-                        {
-                          "username": "{userName}",
-                          "password": "Kate2000!"   ,
-                          "role": "USER"
-                        }""".replace("{userName}", name))
-                .when()
-                .post("http://localhost:4111/api/v1/admin/users")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_CREATED);
+        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
+                .post(createUserRequest);
 
-        errorMessage = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", "Basic YWRtaW46YWRtaW4=")
-                .body("""
-                        {
-                          "username": "{userName}",
-                          "password": "Kate2000!"   ,
-                          "role": "USER"
-                        }""".replace("{userName}", name))
-                .when()
-                .post("http://localhost:4111/api/v1/admin/users")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_BAD_REQUEST)
+        String body = new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.getBadReqStatus())
+                .post(createUserRequest)
                 .extract().body().asString();
-        assertEquals(errorMessage, "Error: Username '" + name + "' already exists.");
+        assertEquals(body, "Error: Username '" + name + "' already exists.");
     }
-
 }
