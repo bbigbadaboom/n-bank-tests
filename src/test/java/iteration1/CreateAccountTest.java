@@ -1,45 +1,31 @@
 package iteration1;
 
 import Models.CreateUserRequest;
-import Models.CreateUserResponse;
-import Models.Roles;
 import Models.UserAccount;
-import Requests.AdminCreateUserRequest;
-import Requests.UserCreateAccountRequest;
-import Requests.UserGetHisAccountsRequest;
 import Specs.RequestSpecs;
 import Specs.ResponseSpecs;
 import org.junit.jupiter.api.Test;
+import skelethon.EndPoints;
+import skelethon.requesters.AdminSteps;
+import skelethon.requesters.CrudRequester;
+import skelethon.requesters.UserSteps;
+import skelethon.requesters.ValidatedCrudRequester;
 
-import static Common.Common.generateName;
-import static Common.Common.generatePassword;
+import static Common.Common.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 
 public class CreateAccountTest {
     @Test
     public void createUserAccountTest() {
-        String name = generateName();
-        String pass = generatePassword(10);
-        CreateUserRequest createUserRequest = CreateUserRequest
-                .builder()
-                .username(name)
-                .password(pass)
-                .role(Roles.USER.toString())
-                .build();
+        CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
+        AdminSteps.adminCreateUser(createUserRequest);
 
-        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
-                .post(createUserRequest).extract().as(CreateUserResponse.class);
+        UserSteps.userCreateAccount(createUserRequest.getUsername(), createUserRequest.getPassword());
 
-        new UserCreateAccountRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.entityCreated())
-                .post();
-
-        List<UserAccount> list = Arrays.asList((UserAccount[])new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
-                .get()
-                .extract().as(UserAccount.class.arrayType()));
+        List<UserAccount> list = UserSteps.userGetHisAccounts(createUserRequest.getUsername(), createUserRequest.getPassword());
         assertAll(
                 () -> assertEquals(list.get(0).getBalance(), 0.0),
                 () -> assertTrue(list.get(0).getTransactions().isEmpty())

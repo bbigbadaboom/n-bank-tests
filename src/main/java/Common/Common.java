@@ -1,17 +1,14 @@
 package Common;
 
+import Models.FieldType;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import java.lang.reflect.Field;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+import com.mifmif.common.regex.Generex;
 
 public class Common {
-    public static String generateName() {
-        String allowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._-";
-        int length = 3 + (int)(Math.random() * 13);
-        return RandomStringUtils.random(length, allowed);
-    }
-
     public static String generatePassword(int length) {
 
         String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -50,6 +47,48 @@ public class Common {
                 ThreadLocalRandom.current().nextInt(first, last);
     }
 
+    public static <T> T generate(Class<T> clazz) {
+        Random random = new Random();
+        try {
+            T instance = clazz.getDeclaredConstructor().newInstance();
+
+            for (Field field : clazz.getDeclaredFields()) {
+                field.setAccessible(true);
+                RegexPattern annotation = field.getAnnotation(RegexPattern.class);
+
+                if (annotation != null && field.getType().equals(String.class)) {
+                    String value;
+                    if (annotation.type() == FieldType.PASSWORD) {
+                        // Генерируем сложный пароль
+                        value = generatePassword(10);
+                    } else {
+                        // Генерируем по regex
+                        value = new Generex(annotation.value()).random();
+                    }
+                    field.set(instance, value);
+                }
+                NumericPattern num = field.getAnnotation(NumericPattern.class);
+                if (num != null) {
+                    double min = num.min();
+                    double max = num.max();
+                    int scale = num.scale();
+                    double val = min + (max - min) * random.nextDouble();
+                    double factor = Math.pow(10, scale);
+                    val = Math.round(val * factor) / factor;
+
+                    if (field.getType() == int.class || field.getType() == Integer.class) {
+                        field.set(instance, (int) val);
+                    } else if (field.getType() == double.class || field.getType() == Double.class) {
+                        field.set(instance, val);
+                    }
+                }
+            }
 
 
+
+            return instance;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

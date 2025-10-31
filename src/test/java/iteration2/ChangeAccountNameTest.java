@@ -1,18 +1,19 @@
 package iteration2;
 
 import Models.*;
-import Requests.AdminCreateUserRequest;
-import Requests.UserChangeProfileNameRequest;
-import Requests.UserGetHisProfileRequest;
 import Specs.RequestSpecs;
 import Specs.ResponseSpecs;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import skelethon.EndPoints;
+import skelethon.requesters.AdminSteps;
+import skelethon.requesters.CrudRequester;
+import skelethon.requesters.UserSteps;
+import skelethon.requesters.ValidatedCrudRequester;
 
-import static Common.Common.generateName;
-import static Common.Common.generatePassword;
+import static Common.Common.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.stream.Stream;
@@ -30,64 +31,32 @@ public class ChangeAccountNameTest {
 
         );
     }
-
     @Test
     public void changeUsersNameTest() {
-        String name = generateName();
-        String pass = generatePassword(10);
-        UserChangeNameRequest userChangeNameRequest = UserChangeNameRequest
-                .builder()
-                .name("New Name")
-                .build();
-        CreateUserRequest createUserRequest = CreateUserRequest
-                .builder()
-                .username(name)
-                .password(pass)
-                .role(Roles.USER.toString())
-                .build();
+        UserChangeNameRequest userChangeNameRequest = generate(UserChangeNameRequest.class);
+        CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
 
-        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
-                .post(createUserRequest).extract().as(CreateUserResponse.class);
+        AdminSteps.adminCreateUser(createUserRequest);
 
-        UserChangeNameResponse userChangeNameResponse = new UserChangeProfileNameRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
-                .put(userChangeNameRequest)
-                .extract()
-                .response().as(UserChangeNameResponse.class);
-        assertEquals(userChangeNameResponse.getCustomer().getName(), "New Name");
+        UserChangeNameResponse userChangeNameResponse =
+                UserSteps.userChangeHisName(userChangeNameRequest,createUserRequest.getUsername(), createUserRequest.getPassword());
+        assertEquals(userChangeNameResponse.getCustomer().getName(), userChangeNameRequest.getName());
 
-        UserGetHisAccountResponse customer = new UserGetHisProfileRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
-                .get()
-                .extract()
-                .response().as(UserGetHisAccountResponse.class);
-        assertEquals(customer.getName(), "New Name");
+        UserGetHisProfileResponse customer = UserSteps.userGetHisProfile(createUserRequest.getUsername(), createUserRequest.getPassword());
+        assertEquals(customer.getName(), userChangeNameRequest.getName());
     }
 
     @ParameterizedTest(name = "{displayName} {0}")
     @MethodSource("inValidData")
     public void changeUsersNameWithInvalidDataTest(String testName, String name, String error) {
-        String username = generateName();
-        String pass = generatePassword(10);
-        UserChangeNameRequest userChangeNameRequest = UserChangeNameRequest
-                .builder()
-                .name(name)
-                .build();
-        CreateUserRequest createUserRequest = CreateUserRequest
-                .builder()
-                .username(username)
-                .password(pass)
-                .role(Roles.USER.toString())
-                .build();
+        UserChangeNameRequest userChangeNameRequest = generate(UserChangeNameRequest.class);
+        userChangeNameRequest.setName(name);
+        CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
 
-        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
-                .post(createUserRequest).extract().as(CreateUserResponse.class);
+        AdminSteps.adminCreateUser(createUserRequest);
+        UserSteps.userChangeHisNameWithBadData(userChangeNameRequest, createUserRequest.getUsername(), createUserRequest.getPassword(), error);
 
-        new UserChangeProfileNameRequest(RequestSpecs.userAuthSpec(username, pass), ResponseSpecs.getBadReqStatusWithMessage(error))
-                .put(userChangeNameRequest);
-
-        GetUserProfile getUserProfile = new UserGetHisProfileRequest(RequestSpecs.userAuthSpec(username, pass), ResponseSpecs.getOkStatus())
-                .get()
-                .extract()
-                .response().as(GetUserProfile.class);
+        UserGetHisProfileResponse getUserProfile = UserSteps.userGetHisProfile(createUserRequest.getUsername(), createUserRequest.getPassword());
         assertNull(getUserProfile.getName());
     }
 

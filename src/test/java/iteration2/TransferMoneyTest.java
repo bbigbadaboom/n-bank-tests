@@ -1,15 +1,13 @@
 package iteration2;
 
 import Models.*;
-import Requests.*;
-import Specs.RequestSpecs;
-import Specs.ResponseSpecs;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import skelethon.requesters.AdminSteps;
+import skelethon.requesters.UserSteps;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -28,44 +26,31 @@ public class TransferMoneyTest {
     }
     @Test
     public void transferMoneyBetweenUsersAccountsTest() {
-        String name = generateName();
-        String pass = generatePassword(10);
         double balance = randomDouble(2000, 5001);
         double amount = randomDouble(1000, 2000);
-        CreateUserRequest createUserRequest = CreateUserRequest
-                .builder()
-                .username(name)
-                .password(pass)
-                .role(Roles.USER.toString())
-                .build();
+        CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
+        AdminSteps.adminCreateUser(createUserRequest);
 
-        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
-                .post(createUserRequest).extract().as(CreateUserResponse.class);
-
-        UserAccount userAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.entityCreated())
-                .post().extract().response().as(UserAccount.class);
+        UserAccount userAccount = UserSteps.userCreateAccount(createUserRequest.getUsername(), createUserRequest.getPassword());
         int accountId = userAccount.getId();
-        UserAccount secondUserAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.entityCreated())
-                .post().extract().response().as(UserAccount.class);
+
+        UserAccount secondUserAccount = UserSteps.userCreateAccount(createUserRequest.getUsername(), createUserRequest.getPassword());
 
         int secondAccountId = secondUserAccount.getId();
 
-        DepositMoneyRequest depositMoneyRequest = DepositMoneyRequest.builder().id(accountId).balance(balance).build();
+        DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
+        depositMoneyRequest.setId(accountId);
+        depositMoneyRequest.setBalance(balance);
 
-        new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
-                .post(depositMoneyRequest);
+        UserSteps.userDepositMoney(depositMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword());
 
-        TransferMoneyRequest transferMoneyRequest = TransferMoneyRequest
-                .builder()
-                .senderAccountId(accountId)
-                .receiverAccountId(secondAccountId)
-                .amount(amount)
-                .build();
+        TransferMoneyRequest transferMoneyRequest = generate(TransferMoneyRequest .class);
+        transferMoneyRequest.setSenderAccountId(accountId);
+        transferMoneyRequest.setReceiverAccountId(secondAccountId);
+        transferMoneyRequest.setAmount(amount);
 
-        TransferMoneyResponse transferMoneyResponse = new UserTransferMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
-                .post(transferMoneyRequest)
-                .extract()
-                .response().as(TransferMoneyResponse.class);
+        TransferMoneyResponse transferMoneyResponse = UserSteps.userTransferMoney(transferMoneyRequest,
+                createUserRequest.getUsername(), createUserRequest.getPassword());
 
         assertAll(
                 () -> assertEquals(transferMoneyResponse.getSenderAccountId(), accountId),
@@ -74,69 +59,49 @@ public class TransferMoneyTest {
                 () -> assertEquals(transferMoneyResponse.getReceiverAccountId(), secondAccountId)
         );
         List<UserAccount> userAccountswithTransfer =
-                Arrays.stream((UserAccount[])new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
-                .get()
-                .extract().as(UserAccount.class.arrayType()))
+                UserSteps.userGetHisAccounts(createUserRequest.getUsername(), createUserRequest.getPassword());
+        List<UserAccount> userAccounts = userAccountswithTransfer.stream()
                 .sorted(Comparator.comparingInt(UserAccount::getId))
                 .toList();
         assertAll(
-                () -> assertEquals(userAccountswithTransfer.get(0).getBalance(), balance - amount),
-                () -> assertEquals(userAccountswithTransfer.get(1).getBalance(), amount)
+                () -> assertEquals(userAccounts.get(0).getBalance(), balance - amount),
+                () -> assertEquals(userAccounts.get(1).getBalance(), amount)
         );
     }
 
     @Test
     public void transferMoneyBetweenDifferentUsersAccounts() {
-        String name = generateName();
-        String pass = generatePassword(10);
-        String secondName = generateName();
+
         double balance = randomDouble(2000, 5001);
         double amount = randomDouble(1000, 2000);
-        CreateUserRequest createUserRequest = CreateUserRequest
-                .builder()
-                .username(name)
-                .password(pass)
-                .role(Roles.USER.toString())
-                .build();
+        CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
 
-        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
-                .post(createUserRequest).extract().as(CreateUserResponse.class);
+        AdminSteps.adminCreateUser(createUserRequest);
 
-        CreateUserRequest createSecondUserRequest = CreateUserRequest
-                .builder()
-                .username(secondName)
-                .password(pass)
-                .role(Roles.USER.toString())
-                .build();
+        CreateUserRequest createSecondUserRequest = generate(CreateUserRequest.class);
 
-        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
-                .post(createSecondUserRequest).extract().as(CreateUserResponse.class);
+        AdminSteps.adminCreateUser(createSecondUserRequest);
 
-        UserAccount userAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.entityCreated())
-                .post().extract().response().as(UserAccount.class);
+        UserAccount userAccount = UserSteps.userCreateAccount(createUserRequest.getUsername(), createUserRequest.getPassword());
         int accountId = userAccount.getId();
 
-        UserAccount secondUserAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(secondName, pass), ResponseSpecs.entityCreated())
-                .post().extract().response().as(UserAccount.class);
+        UserAccount secondUserAccount = UserSteps.userCreateAccount(createSecondUserRequest.getUsername(), createSecondUserRequest.getPassword());;
 
         int secondAccountId = secondUserAccount.getId();
 
-        DepositMoneyRequest depositMoneyRequest = DepositMoneyRequest.builder().id(accountId).balance(balance).build();
+        DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
+        depositMoneyRequest.setId(accountId);
+        depositMoneyRequest.setBalance(balance);
 
-            new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
-                    .post(depositMoneyRequest);
+        UserSteps.userDepositMoney(depositMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword());
 
-            TransferMoneyRequest transferMoneyRequest = TransferMoneyRequest
-                .builder()
-                .senderAccountId(accountId)
-                .receiverAccountId(secondAccountId)
-                .amount(amount)
-                .build();
+        TransferMoneyRequest transferMoneyRequest = generate(TransferMoneyRequest .class);
+        transferMoneyRequest.setSenderAccountId(accountId);
+        transferMoneyRequest.setReceiverAccountId(secondAccountId);
+        transferMoneyRequest.setAmount(amount);
 
-        TransferMoneyResponse transferMoneyResponse = new UserTransferMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
-                .post(transferMoneyRequest)
-                .extract()
-                .response().as(TransferMoneyResponse.class);
+        TransferMoneyResponse transferMoneyResponse = UserSteps.userTransferMoney(transferMoneyRequest,
+                createUserRequest.getUsername(), createUserRequest.getPassword());
 
         assertAll(
                 () -> assertEquals(transferMoneyResponse.getSenderAccountId(), accountId),
@@ -145,192 +110,131 @@ public class TransferMoneyTest {
                 () -> assertEquals(transferMoneyResponse.getReceiverAccountId(), secondAccountId)
         );
 
-        List<UserAccount> firstUserAccountswithTransfer = Arrays.asList((UserAccount[])new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass),
-                ResponseSpecs.getOkStatus())
-                .get()
-                .extract()
-                .as(UserAccount.class.arrayType()));
+        List<UserAccount> firstUserAccountswithTransfer = UserSteps.userGetHisAccounts(createUserRequest.getUsername(), createUserRequest.getPassword());
         assertEquals(firstUserAccountswithTransfer.get(0).getBalance(), balance - amount);
 
-        List<UserAccount> secondUserAccountswithTransfer = Arrays.asList((UserAccount[])new UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(secondName, pass),
-                ResponseSpecs.getOkStatus())
-                .get()
-                .extract()
-                .as(UserAccount.class.arrayType()));
+        List<UserAccount> secondUserAccountswithTransfer = UserSteps.userGetHisAccounts(createSecondUserRequest.getUsername(), createSecondUserRequest.getPassword());
         assertEquals(secondUserAccountswithTransfer.get(0).getBalance(), amount);
     }
 
     @Test
     public void transferMoneyFromInvalidAccountTest() {
-        String name = generateName();
-        String pass = generatePassword(10);
         double balance = randomDouble(2000, 5001);
         double amount = randomDouble(1000, 2000);
-        CreateUserRequest createUserRequest = CreateUserRequest
-                .builder()
-                .username(name)
-                .password(pass)
-                .role(Roles.USER.toString())
-                .build();
+        CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
+        AdminSteps.adminCreateUser(createUserRequest);
 
-        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
-                .post(createUserRequest).extract().as(CreateUserResponse.class);
-
-        UserAccount userAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.entityCreated())
-                .post().extract().response().as(UserAccount.class);
+        UserAccount userAccount = UserSteps.userCreateAccount(createUserRequest.getUsername(), createUserRequest.getPassword());
         int accountId = userAccount.getId();
 
-        DepositMoneyRequest depositMoneyRequest = DepositMoneyRequest.builder().id(accountId).balance(balance).build();
+        DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
+        depositMoneyRequest.setId(accountId);
+        depositMoneyRequest.setBalance(balance);
 
-        new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
-                .post(depositMoneyRequest);
+        UserSteps.userDepositMoney(depositMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword());
 
-        TransferMoneyRequest transferMoneyRequest = TransferMoneyRequest
-                .builder()
-                .senderAccountId(-10)
-                .receiverAccountId(accountId)
-                .amount(amount)
-                .build();
+        TransferMoneyRequest transferMoneyRequest = generate(TransferMoneyRequest .class);
+        transferMoneyRequest.setSenderAccountId(-10);
+        transferMoneyRequest.setReceiverAccountId(accountId);
+        transferMoneyRequest.setAmount(amount);
 
-        new UserTransferMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getForbiddenStatus())
-                .post(transferMoneyRequest);
+        UserSteps.userTransferMoneyWithNoAcces(transferMoneyRequest,createUserRequest.getUsername(), createUserRequest.getPassword());
     }
 
     @Test
     public void transferMoneyToInvalidAccountTest() {
-        String name = generateName();
-        String pass = generatePassword(10);
         double balance = randomDouble(2000, 5001);
         double amount = randomDouble(1000, 2000);
-        CreateUserRequest createUserRequest = CreateUserRequest
-                .builder()
-                .username(name)
-                .password(pass)
-                .role(Roles.USER.toString())
-                .build();
+        CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
 
-        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
-                .post(createUserRequest).extract().as(CreateUserResponse.class);
+        AdminSteps.adminCreateUser(createUserRequest);
 
-        UserAccount userAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.entityCreated())
-                .post().extract().response().as(UserAccount.class);
+        UserAccount userAccount = UserSteps.userCreateAccount(createUserRequest.getUsername(), createUserRequest.getPassword());
         int accountId = userAccount.getId();
 
-        DepositMoneyRequest depositMoneyRequest = DepositMoneyRequest.builder().id(accountId).balance(balance).build();
+        DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
+        depositMoneyRequest.setId(accountId);
+        depositMoneyRequest.setBalance(balance);
 
-        new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
-                .post(depositMoneyRequest);
-        TransferMoneyRequest transferMoneyRequest = TransferMoneyRequest
-                .builder()
-                .senderAccountId(accountId)
-                .receiverAccountId(-10)
-                .amount(amount)
-                .build();
-        new UserTransferMoneyRequest(RequestSpecs.userAuthSpec(name, pass),
-                ResponseSpecs.getBadReqStatusWithMessage("Invalid transfer: insufficient funds or invalid accounts"))
-                .post(transferMoneyRequest);
+        UserSteps.userDepositMoney(depositMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword());
+        TransferMoneyRequest transferMoneyRequest = generate(TransferMoneyRequest .class);
+        transferMoneyRequest.setSenderAccountId(accountId);
+        transferMoneyRequest.setReceiverAccountId(-10);
+        transferMoneyRequest.setAmount(amount);
+        UserSteps.userTransferMoneyWitBadData(transferMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword(),
+                "Invalid transfer: insufficient funds or invalid accounts");
     }
 
     @ParameterizedTest(name = "{displayName} {0}")
     @MethodSource("inValidAmountData")
     public void transferMoneywithInvalidAmountTest(String testName, Double amount, String error) {
-        String name = generateName();
-        String pass = generatePassword(10);
         double balance = randomDouble(2000, 5001);
-        CreateUserRequest createUserRequest = CreateUserRequest
-                .builder()
-                .username(name)
-                .password(pass)
-                .role(Roles.USER.toString())
-                .build();
+        CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
+        AdminSteps.adminCreateUser(createUserRequest);
 
-        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
-                .post(createUserRequest).extract().as(CreateUserResponse.class);
-
-        UserAccount userAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.entityCreated())
-                .post().extract().response().as(UserAccount.class);
+        UserAccount userAccount = UserSteps.userCreateAccount(createUserRequest.getUsername(), createUserRequest.getPassword());
         int accountId = userAccount.getId();
-        UserAccount secondUserAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.entityCreated())
-                .post().extract().response().as(UserAccount.class);
+        UserAccount secondUserAccount = UserSteps.userCreateAccount(createUserRequest.getUsername(), createUserRequest.getPassword());
 
         int secondAccountId = secondUserAccount.getId();
 
-        DepositMoneyRequest depositMoneyRequest = DepositMoneyRequest.builder().id(accountId).balance(balance).build();
+        DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
+        depositMoneyRequest.setId(accountId);
+        depositMoneyRequest.setBalance(balance);
 
+        repeat(3, () -> UserSteps.userDepositMoney(depositMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword()));
 
-        repeat(3, () -> new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
-                    .post(depositMoneyRequest));
+        TransferMoneyRequest transferMoneyRequest = generate(TransferMoneyRequest .class);
+        transferMoneyRequest.setSenderAccountId(accountId);
+        transferMoneyRequest.setReceiverAccountId(secondAccountId);
+        transferMoneyRequest.setAmount(amount);
 
-        TransferMoneyRequest transferMoneyRequest = TransferMoneyRequest
-                .builder()
-                .senderAccountId(accountId)
-                .receiverAccountId(secondAccountId)
-                .amount(amount)
-                .build();
+        UserSteps.userTransferMoneyWitBadData(transferMoneyRequest,createUserRequest.getUsername(), createUserRequest.getPassword(), error );
 
-        new UserTransferMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getBadReqStatusWithMessage(error))
-                .post(transferMoneyRequest);
-
-        List<UserAccount> userAccountswithTransfer = Arrays.stream((UserAccount[])new
-                        UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
-                .get()
-                .extract().as(UserAccount.class.arrayType()))
+        List<UserAccount> userAccountswithTransfer = UserSteps.userGetHisAccounts(createUserRequest.getUsername(), createUserRequest.getPassword());
+        List<UserAccount> usersAccounts = userAccountswithTransfer.stream()
                 .sorted(Comparator.comparingInt(UserAccount::getId))
                 .toList();
         assertAll(
-                () -> assertEquals(userAccountswithTransfer.get(0).getBalance(), balance * 3),
-                () -> assertEquals(userAccountswithTransfer.get(1).getBalance(), 0.0)
+                () -> assertEquals(usersAccounts.get(0).getBalance(), balance * 3),
+                () -> assertEquals(usersAccounts.get(1).getBalance(), 0.0)
         );
     }
 
     @Test
     public void transferMoneywithAmountMoreThanBalanceTest() {
-        String name = generateName();
-        String pass = generatePassword(10);
         double amount = randomDouble(2000, 5001);
         double balance = randomDouble(1000, 2000);
-        CreateUserRequest createUserRequest = CreateUserRequest
-                .builder()
-                .username(name)
-                .password(pass)
-                .role(Roles.USER.toString())
-                .build();
+        CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
 
-        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
-                .post(createUserRequest).extract().as(CreateUserResponse.class);
+        AdminSteps.adminCreateUser(createUserRequest);
 
-        UserAccount userAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.entityCreated())
-                .post().extract().response().as(UserAccount.class);
+        UserAccount userAccount = UserSteps.userCreateAccount(createUserRequest.getUsername(), createUserRequest.getPassword());
+
         int accountId = userAccount.getId();
-        UserAccount secondUserAccount = new UserCreateAccountRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.entityCreated())
-                .post().extract().response().as(UserAccount.class);
-
+        UserAccount secondUserAccount = UserSteps.userCreateAccount(createUserRequest.getUsername(), createUserRequest.getPassword());
         int secondAccountId = secondUserAccount.getId();
 
-        DepositMoneyRequest depositMoneyRequest = DepositMoneyRequest.builder().id(accountId).balance(balance).build();
+        DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
+        depositMoneyRequest.setId(accountId);
+        depositMoneyRequest.setBalance(balance);
 
-        new UserDepositMoneyRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
-                .post(depositMoneyRequest);
+        UserSteps.userDepositMoney(depositMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword());
 
-        TransferMoneyRequest transferMoneyRequest = TransferMoneyRequest
-                .builder()
-                .senderAccountId(accountId)
-                .receiverAccountId(secondAccountId)
-                .amount(amount)
-                .build();
+        TransferMoneyRequest transferMoneyRequest = generate(TransferMoneyRequest .class);
+        transferMoneyRequest.setSenderAccountId(accountId);
+        transferMoneyRequest.setReceiverAccountId(secondAccountId);
+        transferMoneyRequest.setAmount(amount);
 
-          new UserTransferMoneyRequest(RequestSpecs.userAuthSpec(name, pass),
-                  ResponseSpecs.getBadReqStatusWithMessage("Invalid transfer: insufficient funds or invalid accounts"))
-                .post(transferMoneyRequest);
-        List<UserAccount> userAccountswithTransfer = Arrays.stream((UserAccount[])new
-                        UserGetHisAccountsRequest(RequestSpecs.userAuthSpec(name, pass), ResponseSpecs.getOkStatus())
-                .get()
-                .extract().as(UserAccount.class.arrayType()))
+        UserSteps.userTransferMoneyWitBadData(transferMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword(),
+                "Invalid transfer: insufficient funds or invalid accounts");
+        List<UserAccount> userAccountswithTransfer = UserSteps.userGetHisAccounts(createUserRequest.getUsername(), createUserRequest.getPassword());
+        List<UserAccount> userAccounts= userAccountswithTransfer.stream()
                 .sorted(Comparator.comparingInt(UserAccount::getId))
                 .toList();
         assertAll(
-                () -> assertEquals(userAccountswithTransfer.get(0).getBalance(), balance),
-                () -> assertEquals(userAccountswithTransfer.get(1).getBalance(), 0.0)
+                () -> assertEquals(userAccounts.get(0).getBalance(), balance),
+                () -> assertEquals(userAccounts.get(1).getBalance(), 0.0)
         );
     }
 }
