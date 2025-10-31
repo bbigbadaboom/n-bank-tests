@@ -20,6 +20,10 @@ public class ResponseSpecs {
         return defaaultSpecBuilder().expectStatusCode(HttpStatus.SC_OK).build();
     }
 
+    public static ResponseSpecification getOkStatusAndCheckHeader(String headerName, String header) {
+        return defaaultSpecBuilder().expectStatusCode(HttpStatus.SC_OK).expectHeader(headerName, header).build();
+    }
+
     public static ResponseSpecification getBadReqStatus() {
         return defaaultSpecBuilder().expectStatusCode(HttpStatus.SC_BAD_REQUEST).build();
     }

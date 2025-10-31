@@ -3,21 +3,22 @@ package iteration1;
 import Models.CreateUserRequest;
 import Models.CreateUserResponse;
 import Models.Roles;
-import Requests.AdminCreateUserRequest;
-import Requests.AdminGetAllUsersRequest;
 import Specs.RequestSpecs;
 import Specs.ResponseSpecs;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 
-import static Common.Common.generateName;
-import static Common.Common.generatePassword;
+import static Common.Common.*;
+import static Models.Comparisons.ModelAssertions.assertThatModels;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.params.provider.MethodSource;
+import skelethon.EndPoints;
+import skelethon.requesters.AdminSteps;
+import skelethon.requesters.CrudRequester;
+import skelethon.requesters.ValidatedCrudRequester;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -56,58 +57,35 @@ public class CreateUserTest {
 
     @Test
     public void adminCanCreateUserWithCorrectDataTest() {
-        String name = generateName();
-        String pass = generatePassword(10);
-        CreateUserRequest createUserRequest = CreateUserRequest
-                .builder()
-                .username(name)
-                .password(pass)
-                .role(Roles.USER.toString())
-                .build();
+        CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
 
-        CreateUserResponse createUserResponse = new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
-                .post(createUserRequest).extract().as(CreateUserResponse.class);
+        CreateUserResponse createUserResponse = AdminSteps.adminCreateUser(createUserRequest);
+
         assertAll(
-                () -> assertEquals(createUserResponse.getUsername(), name),
-                () -> assertNotEquals(createUserResponse.getPassword(), pass),
-                () -> assertEquals(createUserResponse.getRole(), Roles.USER.toString())
+                () -> assertThatModels(CreateUserRequest.class, CreateUserResponse.class),
+                () -> assertNotEquals(createUserResponse.getPassword(), createUserRequest.getPassword())
         );
-        List<CreateUserResponse> users = Arrays.asList((CreateUserResponse[])new AdminGetAllUsersRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.getOkStatus())
-                .get().extract().as(CreateUserResponse.class.arrayType()));
+        List<CreateUserResponse> users = AdminSteps.adminGetAllUsers();
         List<String> userNames = users.stream().map(CreateUserResponse::getUsername).toList();
-        assertTrue(userNames.contains(name));
+        assertTrue(userNames.contains(createUserRequest.getUsername()));
     }
     @ParameterizedTest(name = "{displayName} {0}")
     @MethodSource("invalidData")
-    public void adminCantCreateUserWithInvalidDataTest(String name, String username, String password, String role, String responseBody) {
+    public void adminCantCreateUserWithInvalidDataTest(String name, String username, String password, String role, String error) {
 
-        CreateUserRequest createUserRequest = CreateUserRequest
-                .builder()
-                .username(username)
-                .password(password)
-                .role(role)
-                .build();
-        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.getBadReqStatusWithMessage(responseBody))
-                .post(createUserRequest);
+        CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
+        createUserRequest.setRole(role);
+        createUserRequest.setPassword(password);
+        createUserRequest.setUsername(username);
+        AdminSteps.adminCreateUserWithBadData(createUserRequest, error);
     }
 
     @Test
     public void adminCanCreateUserWithCorrectDataButWithExistedUsernameTest() {
-        String name = generateName();
-        String pass = generatePassword(10);
-        CreateUserRequest createUserRequest = CreateUserRequest
-                .builder()
-                .username(name)
-                .password(pass)
-                .role(Roles.USER.toString())
-                .build();
+        CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
+        AdminSteps.adminCreateUser(createUserRequest);
 
-        new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityCreated())
-                .post(createUserRequest);
-
-        String body = new AdminCreateUserRequest(RequestSpecs.adminAuthSpec(), ResponseSpecs.getBadReqStatus())
-                .post(createUserRequest)
-                .extract().body().asString();
-        assertEquals(body, "Error: Username '" + name + "' already exists.");
+        assertEquals(AdminSteps.adminCreateUserWithMistake(createUserRequest),
+                "Error: Username '" + createUserRequest.getUsername() + "' already exists.");
     }
 }

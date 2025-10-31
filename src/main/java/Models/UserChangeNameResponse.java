@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class UserChangeNameResponse extends BaseModel {
-    private UserGetHisAccountResponse customer;
+    private UserGetHisProfileResponse customer;
     private String message;
 }
