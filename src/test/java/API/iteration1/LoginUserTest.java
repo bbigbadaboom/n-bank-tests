@@ -1,17 +1,16 @@
 package API.iteration1;
 
-import Models.CreateUserRequest;
-import Models.LoginUserRequest;
-import Models.Roles;
-import Specs.RequestSpecs;
-import Specs.ResponseSpecs;
+import API.Models.CreateUserRequest;
+import API.Models.LoginUserRequest;
+import API.Specs.RequestSpecs;
+import API.Specs.ResponseSpecs;
 import org.junit.jupiter.api.Test;
-import skelethon.EndPoints;
-import skelethon.requesters.AdminSteps;
-import skelethon.requesters.CrudRequester;
-import skelethon.requesters.UserSteps;
+import API.skelethon.EndPoints;
+import API.skelethon.requesters.AdminSteps;
+import API.skelethon.requesters.CrudRequester;
+import API.skelethon.requesters.UserSteps;
 
-import static Common.Common.*;
+import static API.Common.Common.*;
 
 public class LoginUserTest {
     @Test

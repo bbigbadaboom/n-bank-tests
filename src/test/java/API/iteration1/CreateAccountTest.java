@@ -1,17 +1,14 @@
 package API.iteration1;
 
-import Models.CreateUserRequest;
-import Models.UserAccount;
-import Specs.RequestSpecs;
-import Specs.ResponseSpecs;
+import API.Models.CreateUserRequest;
+import API.Models.UserAccount;
 import org.junit.jupiter.api.Test;
-import skelethon.EndPoints;
-import skelethon.requesters.AdminSteps;
+import API.skelethon.requesters.AdminSteps;
 
-import skelethon.requesters.UserSteps;
+import API.skelethon.requesters.UserSteps;
 
 
-import static Common.Common.*;
+import static API.Common.Common.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;

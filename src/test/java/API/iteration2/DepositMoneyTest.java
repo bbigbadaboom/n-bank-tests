@@ -1,17 +1,20 @@
 package API.iteration2;
 
-import Models.*;
+import API.Models.CreateUserRequest;
+import API.Models.DepositMoneyRequest;
+import API.Models.DepositMoneyResponse;
+import API.Models.UserAccount;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import skelethon.requesters.AdminSteps;
-import skelethon.requesters.UserSteps;
+import API.skelethon.requesters.AdminSteps;
+import API.skelethon.requesters.UserSteps;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import static Common.Common.*;
+import static API.Common.Common.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
