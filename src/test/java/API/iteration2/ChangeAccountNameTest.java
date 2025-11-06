@@ -1,19 +1,17 @@
 package API.iteration2;
 
-import Models.*;
-import Specs.RequestSpecs;
-import Specs.ResponseSpecs;
+import API.Models.CreateUserRequest;
+import API.Models.UserChangeNameRequest;
+import API.Models.UserChangeNameResponse;
+import API.Models.UserGetHisProfileResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import skelethon.EndPoints;
-import skelethon.requesters.AdminSteps;
-import skelethon.requesters.CrudRequester;
-import skelethon.requesters.UserSteps;
-import skelethon.requesters.ValidatedCrudRequester;
+import API.skelethon.requesters.AdminSteps;
+import API.skelethon.requesters.UserSteps;
 
-import static Common.Common.*;
+import static API.Common.Common.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.stream.Stream;

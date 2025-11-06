@@ -1,23 +1,17 @@
 package API.iteration1;
 
-import Models.CreateUserRequest;
-import Models.CreateUserResponse;
-import Models.Roles;
-import Specs.RequestSpecs;
-import Specs.ResponseSpecs;
+import API.Models.CreateUserRequest;
+import API.Models.CreateUserResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 
-import static Common.Common.*;
-import static Models.Comparisons.ModelAssertions.assertThatModels;
+import static API.Common.Common.*;
+import static API.Models.Comparisons.ModelAssertions.assertThatModels;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.params.provider.MethodSource;
-import skelethon.EndPoints;
-import skelethon.requesters.AdminSteps;
-import skelethon.requesters.CrudRequester;
-import skelethon.requesters.ValidatedCrudRequester;
+import API.skelethon.requesters.AdminSteps;
 
 import java.util.List;
 import java.util.stream.Stream;
