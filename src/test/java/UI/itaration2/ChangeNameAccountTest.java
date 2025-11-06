@@ -16,6 +16,7 @@ import API.skelethon.requesters.UserSteps;
 import java.time.Duration;
 
 import static API.Common.Common.generate;
+import static API.Common.Common.generateString;
 import static com.codeborne.selenide.Selenide.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -39,7 +40,8 @@ public class ChangeNameAccountTest extends BaseUiTest {
     public void userCantCreateAccountwithBadDataTest() {
         CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
         UserChangeNameRequest userChangeNameRequest = generate(UserChangeNameRequest.class);
-        userChangeNameRequest.setName("New");
+        String ivalidName = generateString("[A-Za-z]{3}");
+        userChangeNameRequest.setName(ivalidName);
         AdminSteps.adminCreateUser(createUserRequest);
         authUser(createUserRequest.getUsername(), createUserRequest.getPassword());
         new UserPanel().open().clickOnUserName().getPage(EditProfilePage.class)

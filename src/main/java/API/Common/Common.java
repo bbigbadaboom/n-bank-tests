@@ -45,6 +45,11 @@ public class Common {
         return
                 ThreadLocalRandom.current().nextInt(first, last);
     }
+    public static String generateString(String regexp) {
+        Generex generex = new Generex(regexp);
+        return generex.random();
+
+    }
 
     public static <T> T generate(Class<T> clazz) {
         Random random = new Random();
