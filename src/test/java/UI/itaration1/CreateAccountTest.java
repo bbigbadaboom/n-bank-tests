@@ -1,11 +1,9 @@
 package UI.itaration1;
 
-import API.Models.CreateUserRequest;
 import API.Models.UserAccount;
-import API.skelethon.requesters.AdminSteps;
 import Common.Anotations.Browsers;
 import Common.Anotations.UserSession;
-import Common.Extensions.UserSessionExtension;
+import Common.Extensions.UserExtension;
 import Common.Storage.SessionStorage;
 import UI.BaseUiTest;
 import UI.Pages.UserPanel;
@@ -17,7 +15,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(UserSessionExtension.class)
 public class CreateAccountTest extends BaseUiTest {
 
     @Test

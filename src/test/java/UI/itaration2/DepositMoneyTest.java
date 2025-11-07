@@ -1,18 +1,15 @@
 package UI.itaration2;
 
-import API.Models.CreateUserRequest;
 import API.Models.DepositMoneyRequest;
 import API.Models.UserAccount;
 import Common.Anotations.UserSession;
-import Common.Extensions.UserSessionExtension;
+import Common.Extensions.UserExtension;
 import Common.Storage.SessionStorage;
 import UI.BaseUiTest;
 import UI.Pages.DepositPage;
 import UI.Pages.UserPanel;
 import UI.Utils.Alerts;
 import org.junit.jupiter.api.Test;
-import API.skelethon.requesters.AdminSteps;
-import API.skelethon.requesters.UserSteps;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
@@ -21,7 +18,6 @@ import static API.Common.Common.generate;
 import static API.Common.Common.randomDouble;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(UserSessionExtension.class)
 public class DepositMoneyTest extends BaseUiTest {
 
     @Test

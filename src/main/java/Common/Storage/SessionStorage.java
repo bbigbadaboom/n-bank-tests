@@ -1,18 +1,13 @@
 package Common.Storage;
 
 import API.Models.CreateUserRequest;
-import API.Models.CreateUserResponse;
-import API.Models.LoginUserResponse;
 import API.skelethon.requesters.UserSteps;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SessionStorage {
     private static final SessionStorage INTSTANCE = new SessionStorage();
-    private final Map<CreateUserRequest, UserSteps> userStepsMap = new HashMap<>();
+    private final LinkedHashMap<CreateUserRequest, UserSteps> userStepsMap = new LinkedHashMap<>();
     private SessionStorage(){
     }
     public static void addUsers(List<CreateUserRequest> users) {
@@ -25,6 +20,10 @@ public class SessionStorage {
 
     }
 
+    public static List<CreateUserRequest> getUsers() {
+        return new ArrayList<>(INTSTANCE.userStepsMap.keySet());
+
+    }
     public static CreateUserRequest getUser() {
         return getUser(1);
     }
