@@ -8,6 +8,13 @@ import API.skelethon.EndPoints;
 import java.util.List;
 
 public class UserSteps {
+    private String name;
+    private String pass;
+
+    public UserSteps(String username, String password) {
+        this.name = username;
+        this.pass = password;
+    }
     public static UserChangeNameResponse userChangeHisName(UserChangeNameRequest userChangeNameRequest, String name, String pass) {
         return new ValidatedCrudRequester<UserChangeNameResponse>
                 (RequestSpecs.userAuthSpec(name, pass), EndPoints.PUT_CUSTOMER_PROFILE,
@@ -17,7 +24,7 @@ public class UserSteps {
     }
 
     public static void userLogin(LoginUserRequest loginUserRequest) {
-        new CrudRequester(RequestSpecs.adminAuthSpec(), EndPoints.POST_LOGIN, ResponseSpecs.getOkStatus())
+        new CrudRequester(RequestSpecs.unAuthSpec(), EndPoints.POST_LOGIN, ResponseSpecs.getOkStatus())
                 .post(loginUserRequest);
 
     }
@@ -35,6 +42,12 @@ public class UserSteps {
                         EndPoints.GET_CUSTOMER_PROFILE, ResponseSpecs.getOkStatus())
                 .get();
     }
+    public UserGetHisProfileResponse userGetHisProfile() {
+        return  new ValidatedCrudRequester<UserGetHisProfileResponse>
+                (RequestSpecs.userAuthSpec(name, pass),
+                        EndPoints.GET_CUSTOMER_PROFILE, ResponseSpecs.getOkStatus())
+                .get();
+    }
 
     public static UserAccount userCreateAccount(String name, String pass) {
         return new ValidatedCrudRequester<UserAccount>
@@ -44,7 +57,22 @@ public class UserSteps {
 
     }
 
+    public  UserAccount userCreateAccount() {
+        return new ValidatedCrudRequester<UserAccount>
+                (RequestSpecs.userAuthSpec(name, pass),
+                        EndPoints.POST_ACCOUNTS, ResponseSpecs.entityCreated())
+                .post();
+
+    }
+
     public static DepositMoneyResponse userDepositMoney(DepositMoneyRequest depositMoneyRequest, String name, String pass) {
+        return new ValidatedCrudRequester<DepositMoneyResponse>
+                (RequestSpecs.userAuthSpec(name, pass),
+                        EndPoints.POST_ACCOUNTS_DEPOSIT, ResponseSpecs.getOkStatus())
+                .post(depositMoneyRequest);
+    }
+
+    public DepositMoneyResponse userDepositMoney(DepositMoneyRequest depositMoneyRequest) {
         return new ValidatedCrudRequester<DepositMoneyResponse>
                 (RequestSpecs.userAuthSpec(name, pass),
                         EndPoints.POST_ACCOUNTS_DEPOSIT, ResponseSpecs.getOkStatus())
@@ -61,6 +89,13 @@ public class UserSteps {
         new CrudRequester(RequestSpecs.userAuthSpec(name, pass),
                 EndPoints.POST_ACCOUNTS_DEPOSIT, ResponseSpecs.getForbiddenStatus())
                 .post(depositMoneyRequest);
+    }
+
+    public List<UserAccount> userGetHisAccounts() {
+        return new ValidatedCrudRequester<UserAccount>
+                (RequestSpecs.userAuthSpec(name, pass),
+                        EndPoints.GET_CUSTOMER_ACCOUNTS, ResponseSpecs.getOkStatus())
+                .getList();
     }
 
     public static List<UserAccount> userGetHisAccounts(String name, String pass) {

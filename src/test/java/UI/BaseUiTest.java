@@ -3,10 +3,13 @@ package UI;
 import API.Configs.Config;
 import API.Models.LoginUserRequest;
 import API.Specs.RequestSpecs;
+import Common.Extensions.AdminSessionExtension;
+import Common.Extensions.BrowsersExtension;
 import UI.Utils.Alerts;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.Alert;
 
 import java.util.Map;
@@ -14,6 +17,10 @@ import java.util.Map;
 import static com.codeborne.selenide.Selenide.executeJavaScript;
 import static com.codeborne.selenide.Selenide.switchTo;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@ExtendWith(AdminSessionExtension.class)
+@ExtendWith(AdminSessionExtension.class)
+@ExtendWith(BrowsersExtension.class)
 
 public class BaseUiTest {
     @BeforeAll

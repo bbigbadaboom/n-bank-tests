@@ -1,15 +1,22 @@
 package UI.Pages;
 
+import API.Models.CreateUserRequest;
+import API.Models.CreateUserResponse;
+import API.Models.LoginUserRequest;
+import API.Models.LoginUserResponse;
+import API.Specs.RequestSpecs;
+import UI.UiElements.BaseElement;
 import UI.Utils.Alerts;
-import com.codeborne.selenide.Condition;
-import com.codeborne.selenide.Selectors;
-import com.codeborne.selenide.Selenide;
-import com.codeborne.selenide.SelenideElement;
+import com.codeborne.selenide.*;
 import lombok.Getter;
 import org.openqa.selenium.Alert;
 
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.switchTo;
+import java.util.List;
+import java.util.function.Function;
+
+import static com.codeborne.selenide.Selenide.*;
+import static com.codeborne.selenide.Selenide.executeJavaScript;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Getter
@@ -31,5 +38,25 @@ public abstract class BasePage<T extends BasePage> {
         assertTrue(alert.getText().contains(message.getAlert()));
         alert.accept();
         return (T)this;
+    }
+
+    public static void authUser(String name, String pass) {
+        Selenide.open("/");
+        executeJavaScript("localStorage.setItem('authToken', arguments[0]);", RequestSpecs.getAuth(name, pass));
+    }
+    public static void authUser(LoginUserRequest createUserRequest) {
+        Selenide.open("/");
+        executeJavaScript("localStorage.setItem('authToken', arguments[0]);",
+                RequestSpecs.getAuth(createUserRequest.getUsername(), createUserRequest.getPassword()));
+    }
+    public static void authUser(CreateUserRequest createUserRequest) {
+        Selenide.open("/");
+        executeJavaScript("localStorage.setItem('authToken', arguments[0]);",
+                RequestSpecs.getAuth(createUserRequest.getUsername(), createUserRequest.getPassword()));
+    }
+
+    public <T extends BaseElement> List<T> generatePageElements(ElementsCollection elementsCollection,
+                                                                   Function<SelenideElement, T> constructor) {
+        return elementsCollection.stream().map(constructor).toList();
     }
 }
