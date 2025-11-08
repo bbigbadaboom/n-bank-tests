@@ -7,7 +7,7 @@ import UI.Pages.BasePage;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import static API.Common.Common.generate;
+import static Common.Common.generate;
 
 public class AdminSessionExtension implements BeforeEachCallback {
     @Override

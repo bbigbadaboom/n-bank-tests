@@ -15,7 +15,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import java.util.LinkedList;
 import java.util.List;
 
-import static API.Common.Common.generate;
+import static Common.Common.generate;
 
 public class UserExtension implements BeforeEachCallback {
     @Override

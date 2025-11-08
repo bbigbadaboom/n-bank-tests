@@ -1,25 +1,17 @@
 package UI.itaration1;
 
-import API.Configs.Config;
 import API.Models.CreateUserRequest;
 import API.Models.CreateUserResponse;
-import API.Models.LoginUserRequest;
 import Common.Anotations.AdminSession;
-import Common.Extensions.AdminSessionExtension;
 import UI.Pages.AdminPanel;
 import UI.BaseUiTest;
 import UI.Utils.Alerts;
-import com.codeborne.selenide.*;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.openqa.selenium.Alert;
 import API.skelethon.requesters.AdminSteps;
 
-import java.time.Duration;
 import java.util.List;
 
-import static API.Common.Common.generate;
-import static com.codeborne.selenide.Selenide.*;
+import static Common.Common.generate;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CreateUserTest extends BaseUiTest {

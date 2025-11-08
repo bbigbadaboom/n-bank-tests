@@ -1,4 +1,4 @@
-package API.Common;
+package Common.Anotations;
 
 import API.Models.FieldType;
 

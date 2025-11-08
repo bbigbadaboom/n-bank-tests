@@ -10,7 +10,7 @@ import API.skelethon.requesters.AdminSteps;
 import API.skelethon.requesters.CrudRequester;
 import API.skelethon.requesters.UserSteps;
 
-import static API.Common.Common.*;
+import static Common.Common.*;
 
 public class LoginUserTest {
     @Test

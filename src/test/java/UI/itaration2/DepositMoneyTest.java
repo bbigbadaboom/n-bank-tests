@@ -3,19 +3,17 @@ package UI.itaration2;
 import API.Models.DepositMoneyRequest;
 import API.Models.UserAccount;
 import Common.Anotations.UserSession;
-import Common.Extensions.UserExtension;
 import Common.Storage.SessionStorage;
 import UI.BaseUiTest;
 import UI.Pages.DepositPage;
 import UI.Pages.UserPanel;
 import UI.Utils.Alerts;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
 
-import static API.Common.Common.generate;
-import static API.Common.Common.randomDouble;
+import static Common.Common.generate;
+import static Common.Common.randomDouble;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DepositMoneyTest extends BaseUiTest {

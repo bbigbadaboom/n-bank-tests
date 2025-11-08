@@ -1,6 +1,6 @@
 package API.Models;
 
-import API.Common.RegexPattern;
+import Common.Anotations.RegexPattern;
 import lombok.*;
 
 @Data

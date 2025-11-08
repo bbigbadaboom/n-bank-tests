@@ -3,7 +3,6 @@ package UI.itaration1;
 import API.Configs.Config;
 import API.Models.CreateUserRequest;
 import API.Models.LoginUserRequest;
-import Common.Anotations.AdminSession;
 import UI.Pages.AdminPanel;
 import UI.BaseUiTest;
 import UI.Pages.LoginPage;
@@ -12,7 +11,7 @@ import com.codeborne.selenide.Condition;
 import org.junit.jupiter.api.Test;
 import API.skelethon.requesters.AdminSteps;
 
-import static API.Common.Common.generate;
+import static Common.Common.generate;
 
 public class LoginUserTest extends BaseUiTest {
 
