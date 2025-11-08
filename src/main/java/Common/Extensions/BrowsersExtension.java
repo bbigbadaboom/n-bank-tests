@@ -10,24 +10,22 @@ import java.util.Arrays;
 
 public class BrowsersExtension implements ExecutionCondition {
     @Override
-    public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext extensionContext) {
-        Browsers annotation = extensionContext.getElement()
+    public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
+        Browsers annotation = context.getElement()
                 .map(el -> el.getAnnotation(Browsers.class))
                 .orElse(null);
 
         if (annotation == null) {
-            return ConditionEvaluationResult.enabled("Нет ограничений к браузеру");
+            return ConditionEvaluationResult.enabled("Нет ограничений по браузеру");
         }
 
-        String currentBrowser = Configuration.browser;
-        boolean matches = Arrays.stream(annotation.value())
-                .anyMatch(browser -> browser.equals(currentBrowser));
+        String current = Configuration.browser;
+        String[] allowed = annotation.value();
 
-        if (matches) {
-            return ConditionEvaluationResult.enabled("Текущий браузер удовлетворяет условию: "+ currentBrowser);
-        } {
-            return ConditionEvaluationResult.disabled("Тест пропущен, так как текущий браузер " + currentBrowser +
-                    " не находится в списке допустимых браузеров для теста: " + Arrays.toString(annotation.value()));
-        }
+        return Arrays.asList(allowed).contains(current)
+                ? ConditionEvaluationResult.enabled("Браузер подходит: " + current)
+                : ConditionEvaluationResult.disabled(
+                "Тест пропущен: " + current + " не в списке " + Arrays.toString(allowed)
+        );
     }
 }
