@@ -9,5 +9,4 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface WithAccounts {
     int value() default 1;
-    int auth() default 1;
 }

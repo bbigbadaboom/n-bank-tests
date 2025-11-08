@@ -1,9 +1,7 @@
 package UI.Pages;
 
 import API.Models.CreateUserRequest;
-import API.Models.CreateUserResponse;
 import API.Models.LoginUserRequest;
-import API.Models.LoginUserResponse;
 import API.Specs.RequestSpecs;
 import UI.UiElements.BaseElement;
 import UI.Utils.Alerts;
@@ -16,22 +14,22 @@ import java.util.function.Function;
 
 import static com.codeborne.selenide.Selenide.*;
 import static com.codeborne.selenide.Selenide.executeJavaScript;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Getter
 public abstract class BasePage<T extends BasePage> {
-    public abstract String url();
-    public T open() {
-       return Selenide.open(url(), (Class<T>) this.getClass());
-    }
-    public <T extends BasePage> T getPage(Class <T> pageClass) {
-        return Selenide.page(pageClass);
-    }
     protected final SelenideElement userInput = $(Selectors.byAttribute("placeholder", "Username"));
     protected final SelenideElement userPass =$(Selectors.byAttribute("placeholder", "Password"));
     protected final SelenideElement depositButton = $(Selectors.byText("\uD83D\uDCB0 Deposit Money"));
     protected final SelenideElement transferButton = $(Selectors.byText("\uD83D\uDD04 Make a Transfer"));
+
+    public abstract String url();
+    public T open() {
+        return Selenide.open(url(), (Class<T>) this.getClass());
+    }
+    public <T extends BasePage> T getPage(Class <T> pageClass) {
+        return Selenide.page(pageClass);
+    }
 
     public T checkAlert (Alerts message) {
         Alert alert = switchTo().alert();
