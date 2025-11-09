@@ -1,10 +1,13 @@
-package API.Common;
+package Common;
 
 import API.Models.FieldType;
 
 import java.lang.reflect.Field;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+
+import Common.Anotations.NumericPattern;
+import Common.Anotations.RegexPattern;
 import com.mifmif.common.regex.Generex;
 
 public class Common {

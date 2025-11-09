@@ -2,6 +2,7 @@ package API.Specs;
 
 import API.Configs.Config;
 import API.Models.CreateUserRequest;
+import API.Models.LoginUserRequest;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
@@ -42,12 +43,12 @@ public class RequestSpecs {
 
     public static String getAuth(String name, String pass) {
         if(!tokens.containsKey(name)) {
-            CreateUserRequest loginUserRequest = CreateUserRequest
+            LoginUserRequest loginUserRequest = LoginUserRequest
                     .builder()
                     .username(name)
                     .password(pass)
                     .build();
-            String token = new CrudRequester(RequestSpecs.adminAuthSpec(), EndPoints.POST_LOGIN, ResponseSpecs.getOkStatus())
+            String token = new CrudRequester(RequestSpecs.unAuthSpec(), EndPoints.POST_LOGIN, ResponseSpecs.getOkStatus())
                     .post(loginUserRequest)
                     .extract()
                     .header("Authorization");

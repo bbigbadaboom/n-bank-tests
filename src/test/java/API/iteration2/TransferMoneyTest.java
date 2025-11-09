@@ -12,7 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static API.Common.Common.*;
+import static Common.Common.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TransferMoneyTest {

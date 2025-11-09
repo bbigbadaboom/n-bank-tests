@@ -1,6 +1,6 @@
 package API.Models;
 
-import API.Common.NumericPattern;
+import Common.Anotations.NumericPattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

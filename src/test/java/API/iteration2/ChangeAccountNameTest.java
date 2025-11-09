@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import API.skelethon.requesters.AdminSteps;
 import API.skelethon.requesters.UserSteps;
 
-import static API.Common.Common.*;
+import static Common.Common.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.stream.Stream;

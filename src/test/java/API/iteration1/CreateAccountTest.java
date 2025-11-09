@@ -8,7 +8,7 @@ import API.skelethon.requesters.AdminSteps;
 import API.skelethon.requesters.UserSteps;
 
 
-import static API.Common.Common.*;
+import static Common.Common.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;

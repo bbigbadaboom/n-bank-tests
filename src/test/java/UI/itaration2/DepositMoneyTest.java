@@ -1,36 +1,32 @@
 package UI.itaration2;
 
-import API.Models.CreateUserRequest;
 import API.Models.DepositMoneyRequest;
 import API.Models.UserAccount;
+import Common.Anotations.UserSession;
+import Common.Storage.SessionStorage;
 import UI.BaseUiTest;
 import UI.Pages.DepositPage;
 import UI.Pages.UserPanel;
 import UI.Utils.Alerts;
-import com.codeborne.selenide.Condition;
 import org.junit.jupiter.api.Test;
-import API.skelethon.requesters.AdminSteps;
-import API.skelethon.requesters.UserSteps;
 
 import java.util.List;
 
-import static API.Common.Common.generate;
+import static Common.Common.generate;
+import static Common.Common.randomDouble;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DepositMoneyTest extends BaseUiTest {
 
     @Test
+    @UserSession
     public void userDepositMoneyTest() {
-        CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
-        AdminSteps.adminCreateUser(createUserRequest);
         DepositMoneyRequest dep = generate(DepositMoneyRequest.class);
-
-        authUser(createUserRequest.getUsername(), createUserRequest.getPassword());
-        UserAccount userAccount = UserSteps.userCreateAccount(createUserRequest.getUsername(), createUserRequest.getPassword());
+        UserAccount userAccount = SessionStorage.getSteps().userCreateAccount();
         int accountId = userAccount.getId();
         new UserPanel().open().doDeposit().getPage(DepositPage.class).doDeposit(accountId, dep.getBalance())
                 .checkAlert(Alerts.SUCCES_DEPOSIT);
-        List<UserAccount> userAccountwithDeposit = UserSteps.userGetHisAccounts(createUserRequest.getUsername(), createUserRequest.getPassword());
+        List<UserAccount> userAccountwithDeposit = SessionStorage.getSteps().userGetHisAccounts();
         assertAll(
                 () -> assertEquals(userAccountwithDeposit.get(0).getId(), accountId),
                 () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), dep.getBalance()),
@@ -39,17 +35,16 @@ public class DepositMoneyTest extends BaseUiTest {
     }
 
     @Test
+    @UserSession
     public void userCantDepositMoneyWithInvalidTest() {
-        CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
-        AdminSteps.adminCreateUser(createUserRequest);
+        double balance = randomDouble(-10, -5);
         DepositMoneyRequest dep = generate(DepositMoneyRequest.class);
-        dep.setBalance(-10);
-        authUser(createUserRequest.getUsername(), createUserRequest.getPassword());
-        UserAccount userAccount = UserSteps.userCreateAccount(createUserRequest.getUsername(), createUserRequest.getPassword());
+        dep.setBalance(balance);
+        UserAccount userAccount = SessionStorage.getSteps().userCreateAccount();
         int accountId = userAccount.getId();
         new UserPanel().open().doDeposit().getPage(DepositPage.class).doDeposit(accountId, dep.getBalance())
                 .checkAlert(Alerts.UNSUCCES_DEPOSIT);
-        List<UserAccount> userAccountwithDeposit = UserSteps.userGetHisAccounts(createUserRequest.getUsername(), createUserRequest.getPassword());
+        List<UserAccount> userAccountwithDeposit = SessionStorage.getSteps().userGetHisAccounts();
         assertAll(
                 () -> assertEquals(userAccountwithDeposit.get(0).getId(), accountId),
                 () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), 0.0),

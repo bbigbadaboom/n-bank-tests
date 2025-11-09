@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 
-import static API.Common.Common.*;
+import static Common.Common.*;
 import static API.Models.Comparisons.ModelAssertions.assertThatModels;
 import static org.junit.jupiter.api.Assertions.*;
 
