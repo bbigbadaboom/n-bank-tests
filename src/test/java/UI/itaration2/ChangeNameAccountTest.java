@@ -20,10 +20,10 @@ public class ChangeNameAccountTest extends BaseUiTest {
 
     @Test
     @UserSession
-    public void userCanCreateAccountTest() {
+    public void userCanChangeNametTest() {
         UserChangeNameRequest userChangeNameRequest = generate(UserChangeNameRequest.class);
         new UserPanel().open().clickOnUserName().getPage(EditProfilePage.class)
-                .createUser(userChangeNameRequest.getName())
+                .changeName(userChangeNameRequest.getName())
                 .checkAlert(Alerts.UPDATE_NAME);
         UserGetHisProfileResponse customer = SessionStorage.getSteps().userGetHisProfile();
         assertEquals(customer.getName(), userChangeNameRequest.getName());
@@ -31,12 +31,12 @@ public class ChangeNameAccountTest extends BaseUiTest {
 
     @Test
     @UserSession
-    public void userCantCreateAccountwithBadDataTest() {
+    public void userCantChangeNametTest() {
         UserChangeNameRequest userChangeNameRequest = generate(UserChangeNameRequest.class);
         String ivalidName = generateString("[A-Za-z]{3}");
         userChangeNameRequest.setName(ivalidName);
         new UserPanel().open().clickOnUserName().getPage(EditProfilePage.class)
-                .createUser(userChangeNameRequest.getName()).
+                .changeName(userChangeNameRequest.getName()).
                 checkAlert(Alerts.UNSUCCES_UPDATE_NAME);
         UserGetHisProfileResponse getUserProfile = SessionStorage.getSteps().userGetHisProfile();
         assertNull(getUserProfile.getName());

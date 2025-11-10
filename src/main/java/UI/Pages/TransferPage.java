@@ -25,7 +25,7 @@ public class TransferPage extends BasePage<TransferPage>{
     public TransferPage doTransfer (int value, double balance, int secondValue ) {
         accountChoise.parent().selectOptionByValue(String.valueOf(value));
         recName.setValue("No name");
-        recAccount.setValue("ACC" + String.valueOf(secondValue));
+        recAccount.setValue("ACC" + secondValue);
         amountField.setValue(String.valueOf(balance));
         checkBox.click();
         transButton.click();
