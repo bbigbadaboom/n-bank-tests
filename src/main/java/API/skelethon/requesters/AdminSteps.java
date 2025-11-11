@@ -26,8 +26,8 @@ public class AdminSteps {
 
     }
 
-    public static void adminCreateUserWithBadData(CreateUserRequest createUserRequest,String message) {
-        new CrudRequester(RequestSpecs.adminAuthSpec(), EndPoints.POST_ADMIN_USER, ResponseSpecs.getBadReqStatusWithMessage(message))
+    public static void adminCreateUserWithBadData(CreateUserRequest createUserRequest, String key, List<String> message) {
+        new CrudRequester(RequestSpecs.adminAuthSpec(), EndPoints.POST_ADMIN_USER, ResponseSpecs.getBadReqStatusWithMessage(key, message))
                 .post(createUserRequest);
     }
 }

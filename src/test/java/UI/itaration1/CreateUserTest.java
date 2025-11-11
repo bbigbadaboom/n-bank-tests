@@ -22,7 +22,7 @@ public class CreateUserTest extends BaseUiTest {
     public void createUserTest() {
         CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
         new AdminPanel().open().createUser(createUserRequest.getUsername(), createUserRequest.getPassword()).
-        checkAlert(Alerts.USER_CREATED).getAllUsers().stream().anyMatch(userPage -> userPage.equals(createUserRequest.getUsername()));
+        checkAlert(Alerts.USER_CREATED).findUser(createUserRequest.getUsername());
         List<CreateUserResponse> users = AdminSteps.adminGetAllUsers();
         List<String> userNames = users.stream().map(CreateUserResponse::getUsername).toList();
         assertTrue(userNames.contains(createUserRequest.getUsername()));

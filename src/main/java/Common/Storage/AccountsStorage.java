@@ -18,4 +18,8 @@ public class AccountsStorage {
     public static List<UserAccount> getAccounts() {
         return new ArrayList<>(INTSTANCE.userAccounts.keySet());
     }
+
+    public static void clear() {
+        INTSTANCE.userAccounts.clear();
+    }
 }

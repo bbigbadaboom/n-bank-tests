@@ -16,6 +16,8 @@ public class LoginUserTest {
     @Test
     public void adminCanGenerateAuthTokenTest() {
         LoginUserRequest loginUserRequest = generate(LoginUserRequest.class);
+        loginUserRequest.setUsername("admin");
+        loginUserRequest.setPassword("admin");
         new CrudRequester(RequestSpecs.adminAuthSpec(), EndPoints.POST_LOGIN,
                 ResponseSpecs.getOkStatusAndCheckHeader("Authorization", "Basic YWRtaW46YWRtaW4="))
                 .post(loginUserRequest);

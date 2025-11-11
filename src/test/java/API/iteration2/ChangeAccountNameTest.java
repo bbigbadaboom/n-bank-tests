@@ -14,6 +14,7 @@ import API.skelethon.requesters.UserSteps;
 import static Common.Common.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertNull;

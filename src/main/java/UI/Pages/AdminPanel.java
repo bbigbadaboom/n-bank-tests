@@ -8,6 +8,7 @@ import com.codeborne.selenide.SelenideElement;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.codeborne.selenide.Selenide.$;
 
@@ -31,6 +32,12 @@ public class AdminPanel extends BasePage<AdminPanel> {
     public List<UserPage> getAllUsers() {
         ElementsCollection elementsCollection = $(Selectors.byText("All Users")).parent().findAll("li");
         return generatePageElements(elementsCollection, UserPage::new);
+    }
+
+    public Optional<UserPage> findUser(String name) {
+        return getAllUsers().stream().filter(userPage -> userPage.equals(name)).findFirst();
+
+
     }
 
 }

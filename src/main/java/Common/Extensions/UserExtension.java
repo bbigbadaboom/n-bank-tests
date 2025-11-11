@@ -36,6 +36,7 @@ public class UserExtension implements BeforeEachCallback {
             BasePage.authUser(SessionStorage.getUser(authAsUser));
         }
         if (accanotation != null) {
+            AccountsStorage.clear();
             List<CreateUserRequest> list = SessionStorage.getUsers();
             int count = accanotation.value();
             for (CreateUserRequest createUserRequest : list) {

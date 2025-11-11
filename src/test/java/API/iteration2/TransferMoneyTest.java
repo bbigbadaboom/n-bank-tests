@@ -137,7 +137,6 @@ public class TransferMoneyTest {
         transferMoneyRequest.setSenderAccountId(-10);
         transferMoneyRequest.setReceiverAccountId(accountId);
         transferMoneyRequest.setAmount(amount);
-
         UserSteps.userTransferMoneyWithNoAcces(transferMoneyRequest,createUserRequest.getUsername(), createUserRequest.getPassword());
     }
 
@@ -189,7 +188,7 @@ public class TransferMoneyTest {
         transferMoneyRequest.setReceiverAccountId(secondAccountId);
         transferMoneyRequest.setAmount(amount);
 
-        UserSteps.userTransferMoneyWitBadData(transferMoneyRequest,createUserRequest.getUsername(), createUserRequest.getPassword(), error );
+        UserSteps.userTransferMoneyWitBadData(transferMoneyRequest,createUserRequest.getUsername(), createUserRequest.getPassword(), error);
 
         List<UserAccount> userAccountswithTransfer = UserSteps.userGetHisAccounts(createUserRequest.getUsername(), createUserRequest.getPassword());
         List<UserAccount> usersAccounts = userAccountswithTransfer.stream()
