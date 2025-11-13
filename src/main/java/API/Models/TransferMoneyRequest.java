@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TransferMoneyRequest extends BaseModel{
      @NumericPattern(min = 1, max = 100)
-     private int senderAccountId;
+     private long senderAccountId;
      @NumericPattern(min = 1, max = 100)
-     private int receiverAccountId;
+     private long receiverAccountId;
      @NumericPattern(min = 1, max = 100, scale = 2)
      private double amount;
 }

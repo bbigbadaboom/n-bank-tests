@@ -27,8 +27,8 @@ public class TransferMoneyTest extends BaseUiTest {
     public void userTransferMoney() {
         double balance = randomDouble(2000, 5001);
         double amount = randomDouble(1000, 2000);
-        int accountId = AccountsStorage.getAccounts().get(0).getId();
-        int secondAccountId = AccountsStorage.getAccounts().get(1).getId();
+        long accountId = AccountsStorage.getAccounts().get(0).getId();
+        long secondAccountId = AccountsStorage.getAccounts().get(1).getId();
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
         depositMoneyRequest.setId(accountId);
         depositMoneyRequest.setBalance(balance);
@@ -39,7 +39,7 @@ public class TransferMoneyTest extends BaseUiTest {
         List<UserAccount> userAccountswithTransfer =
                 SessionStorage.getSteps().userGetHisAccounts();
         List<UserAccount> userAccounts = userAccountswithTransfer.stream()
-                .sorted(Comparator.comparingInt(UserAccount::getId))
+                .sorted(Comparator.comparingLong(UserAccount::getId))
                 .toList();
         assertAll(
                 () -> assertEquals(userAccounts.get(0).getBalance(), balance - amount),
@@ -54,8 +54,8 @@ public class TransferMoneyTest extends BaseUiTest {
         double amount = randomDouble(2000, 5001);
         double balance = randomDouble(1000, 2000);
 
-        int accountId = AccountsStorage.getAccounts().get(0).getId();
-        int secondAccountId = AccountsStorage.getAccounts().get(1).getId();
+        long accountId = AccountsStorage.getAccounts().get(0).getId();
+        long secondAccountId = AccountsStorage.getAccounts().get(1).getId();
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
         depositMoneyRequest.setId(accountId);
         depositMoneyRequest.setBalance(balance);
@@ -66,7 +66,7 @@ public class TransferMoneyTest extends BaseUiTest {
         List<UserAccount> userAccountswithTransfer =
                 SessionStorage.getSteps().userGetHisAccounts();
         List<UserAccount> userAccounts = userAccountswithTransfer.stream()
-                .sorted(Comparator.comparingInt(UserAccount::getId))
+                .sorted(Comparator.comparingLong(UserAccount::getId))
                 .toList();
         assertAll(
                 () -> assertEquals(userAccounts.get(0).getBalance(), balance),

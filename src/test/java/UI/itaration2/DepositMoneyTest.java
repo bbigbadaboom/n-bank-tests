@@ -23,7 +23,7 @@ public class DepositMoneyTest extends BaseUiTest {
     public void userDepositMoneyTest() {
         DepositMoneyRequest dep = generate(DepositMoneyRequest.class);
         UserAccount userAccount = SessionStorage.getSteps().userCreateAccount();
-        int accountId = userAccount.getId();
+        long accountId = userAccount.getId();
         new UserPanel().open().doDeposit().getPage(DepositPage.class).doDeposit(accountId, dep.getBalance())
                 .checkAlert(Alerts.SUCCES_DEPOSIT);
         List<UserAccount> userAccountwithDeposit = SessionStorage.getSteps().userGetHisAccounts();
@@ -41,7 +41,7 @@ public class DepositMoneyTest extends BaseUiTest {
         DepositMoneyRequest dep = generate(DepositMoneyRequest.class);
         dep.setBalance(balance);
         UserAccount userAccount = SessionStorage.getSteps().userCreateAccount();
-        int accountId = userAccount.getId();
+        long accountId = userAccount.getId();
         new UserPanel().open().doDeposit().getPage(DepositPage.class).doDeposit(accountId, dep.getBalance())
                 .checkAlert(Alerts.UNSUCCES_DEPOSIT);
         List<UserAccount> userAccountwithDeposit = SessionStorage.getSteps().userGetHisAccounts();

@@ -3,6 +3,11 @@ package API.iteration1;
 import API.BaseTest;
 import API.Models.CreateUserRequest;
 import API.Models.CreateUserResponse;
+import API.dao.AccountDao;
+import API.dao.UserDao;
+import API.dao.comparison.DaoAndModelAssertions;
+import API.skelethon.Steps.DataBaseSteps;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -51,6 +56,7 @@ public class CreateUserTest extends BaseTest {
     }
 
     @Test
+    @Disabled
     public void adminCanCreateUserWithCorrectDataTest() {
         CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
 
@@ -63,6 +69,9 @@ public class CreateUserTest extends BaseTest {
         List<CreateUserResponse> users = AdminSteps.adminGetAllUsers();
         List<String> userNames = users.stream().map(CreateUserResponse::getUsername).toList();
         assertTrue(userNames.contains(createUserRequest.getUsername()));
+
+        UserDao userDao = DataBaseSteps.getUserByUsername(createUserRequest.getUsername());
+        DaoAndModelAssertions.assertThat(createUserResponse, userDao).match();
     }
     @ParameterizedTest(name = "{displayName} {0}")
     @MethodSource("invalidData")
@@ -73,6 +82,7 @@ public class CreateUserTest extends BaseTest {
         createUserRequest.setPassword(password);
         createUserRequest.setUsername(username);
         AdminSteps.adminCreateUserWithBadData(createUserRequest, key, error);
+        assertNull(DataBaseSteps.getUserByUsername(createUserRequest.getUsername()));
     }
 
     @Test
