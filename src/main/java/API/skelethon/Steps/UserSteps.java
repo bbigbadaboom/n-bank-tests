@@ -1,9 +1,11 @@
-package API.skelethon.requesters;
+package API.skelethon.Steps;
 
 import API.Models.*;
 import API.Specs.RequestSpecs;
 import API.Specs.ResponseSpecs;
 import API.skelethon.EndPoints;
+import API.skelethon.requesters.CrudRequester;
+import API.skelethon.requesters.ValidatedCrudRequester;
 
 import java.util.List;
 

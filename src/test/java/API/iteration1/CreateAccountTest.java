@@ -4,9 +4,9 @@ import API.BaseTest;
 import API.Models.CreateUserRequest;
 import API.Models.UserAccount;
 import org.junit.jupiter.api.Test;
-import API.skelethon.requesters.AdminSteps;
+import API.skelethon.Steps.AdminSteps;
 
-import API.skelethon.requesters.UserSteps;
+import API.skelethon.Steps.UserSteps;
 
 
 import static Common.Common.*;

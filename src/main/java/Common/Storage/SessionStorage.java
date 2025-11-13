@@ -1,7 +1,7 @@
 package Common.Storage;
 
 import API.Models.CreateUserRequest;
-import API.skelethon.requesters.UserSteps;
+import API.skelethon.Steps.UserSteps;
 
 import java.util.*;
 

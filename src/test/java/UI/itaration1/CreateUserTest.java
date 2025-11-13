@@ -7,7 +7,7 @@ import UI.Pages.AdminPanel;
 import UI.BaseUiTest;
 import UI.Utils.Alerts;
 import org.junit.jupiter.api.Test;
-import API.skelethon.requesters.AdminSteps;
+import API.skelethon.Steps.AdminSteps;
 
 import java.util.List;
 

@@ -12,7 +12,7 @@ import static API.Models.Comparisons.ModelAssertions.assertThatModels;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.params.provider.MethodSource;
-import API.skelethon.requesters.AdminSteps;
+import API.skelethon.Steps.AdminSteps;
 
 import java.util.List;
 import java.util.stream.Stream;
