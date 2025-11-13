@@ -35,9 +35,7 @@ public class CreateUserTest extends BaseUiTest {
         createUserRequest.setUsername("a");
         new AdminPanel().open()
         .createUser(createUserRequest.getUsername(), createUserRequest.getPassword())
-                .checkAlert(Alerts.USER_NOT_CREATED)
-                .getAllUsers()
-        .stream().anyMatch(userPage -> userPage.equals(createUserRequest.getUsername()));
+                .checkAlert(Alerts.USER_NOT_CREATED);
         List<CreateUserResponse> users = AdminSteps.adminGetAllUsers();
         List<String> userNames = users.stream().map(CreateUserResponse::getUsername).toList();
         assertFalse(userNames.contains(createUserRequest.getUsername()));

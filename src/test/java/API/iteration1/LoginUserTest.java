@@ -1,5 +1,6 @@
 package API.iteration1;
 
+import API.BaseTest;
 import API.Models.CreateUserRequest;
 import API.Models.LoginUserRequest;
 import API.Specs.RequestSpecs;
@@ -12,7 +13,7 @@ import API.skelethon.requesters.UserSteps;
 
 import static Common.Common.*;
 
-public class LoginUserTest {
+public class LoginUserTest extends BaseTest {
     @Test
     public void adminCanGenerateAuthTokenTest() {
         LoginUserRequest loginUserRequest = generate(LoginUserRequest.class);

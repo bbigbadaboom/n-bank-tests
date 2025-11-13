@@ -6,22 +6,22 @@ import API.skelethon.requesters.UserSteps;
 import java.util.*;
 
 public class SessionStorage {
-    private static final SessionStorage INTSTANCE = new SessionStorage();
+    private static final ThreadLocal<SessionStorage> INTSTANCE = ThreadLocal.withInitial(SessionStorage::new);
     private final LinkedHashMap<CreateUserRequest, UserSteps> userStepsMap = new LinkedHashMap<>();
     private SessionStorage(){
     }
     public static void addUsers(List<CreateUserRequest> users) {
         for (CreateUserRequest user: users) {
-            INTSTANCE.userStepsMap.put(user, new UserSteps(user.getUsername(), user.getPassword()));
+            INTSTANCE.get().userStepsMap.put(user, new UserSteps(user.getUsername(), user.getPassword()));
         }
     }
     public static CreateUserRequest getUser(int number) {
-        return new ArrayList<>(INTSTANCE.userStepsMap.keySet()).get(number-1);
+        return new ArrayList<>(INTSTANCE.get().userStepsMap.keySet()).get(number-1);
 
     }
 
     public static List<CreateUserRequest> getUsers() {
-        return new ArrayList<>(INTSTANCE.userStepsMap.keySet());
+        return new ArrayList<>(INTSTANCE.get().userStepsMap.keySet());
 
     }
     public static CreateUserRequest getUser() {
@@ -29,7 +29,7 @@ public class SessionStorage {
     }
 
     public static UserSteps getSteps(int number) {
-        return new ArrayList<>(INTSTANCE.userStepsMap.values()).get(number-1);
+        return new ArrayList<>(INTSTANCE.get().userStepsMap.values()).get(number-1);
     }
 
     public static UserSteps getSteps() {
@@ -37,6 +37,6 @@ public class SessionStorage {
     }
 
     public static void clear() {
-        INTSTANCE.userStepsMap.clear();
+        INTSTANCE.get().userStepsMap.clear();
     }
 }
