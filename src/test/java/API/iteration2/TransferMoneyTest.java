@@ -1,5 +1,6 @@
 package API.iteration2;
 
+import API.BaseTest;
 import API.Models.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,7 +16,7 @@ import java.util.stream.Stream;
 import static Common.Common.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TransferMoneyTest {
+public class TransferMoneyTest extends BaseTest {
 
     private static Stream<Arguments> inValidAmountData() {
         return Stream.of(

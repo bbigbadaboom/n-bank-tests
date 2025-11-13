@@ -1,5 +1,6 @@
 package API.iteration1;
 
+import API.BaseTest;
 import API.Models.CreateUserRequest;
 import API.Models.UserAccount;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 
 
-public class CreateAccountTest {
+public class CreateAccountTest extends BaseTest {
     @Test
     public void createUserAccountTest() {
             CreateUserRequest createUserRequest = generate(CreateUserRequest.class);

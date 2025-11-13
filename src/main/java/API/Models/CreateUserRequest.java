@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class CreateUserRequest extends BaseModel {
-    @RegexPattern("[A-Za-z0-9._-]{3,15}")
+    @RegexPattern("[A-Za-z0-9]{5,15}")
     private String username;
     @RegexPattern(type = FieldType.PASSWORD)
     private String password;

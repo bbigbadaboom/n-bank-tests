@@ -1,5 +1,6 @@
 package API.iteration2;
 
+import API.BaseTest;
 import API.Models.CreateUserRequest;
 import API.Models.UserChangeNameRequest;
 import API.Models.UserChangeNameResponse;
@@ -20,7 +21,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 
-public class ChangeAccountNameTest {
+public class ChangeAccountNameTest extends BaseTest {
     private static Stream<Arguments> inValidData() {
         return Stream.of(
                 Arguments.of("one word", "NewNAme", "Name must contain two words with letters only"),

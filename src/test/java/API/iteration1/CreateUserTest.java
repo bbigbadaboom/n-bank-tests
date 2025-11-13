@@ -1,5 +1,6 @@
 package API.iteration1;
 
+import API.BaseTest;
 import API.Models.CreateUserRequest;
 import API.Models.CreateUserResponse;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 
-public class CreateUserTest {
+public class CreateUserTest extends BaseTest {
     private static Stream<Arguments> invalidData() {
         return Stream.of(
                 Arguments.of("blank username", "     ", "Kate1998@", "USER", "username", List.of("Username cannot be blank",

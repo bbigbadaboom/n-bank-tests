@@ -17,7 +17,6 @@ import java.util.List;
 
 import static Common.Common.generate;
 import static Common.Common.randomDouble;
-import static UI.Pages.BasePage.authUser;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TransferMoneyTest extends BaseUiTest {

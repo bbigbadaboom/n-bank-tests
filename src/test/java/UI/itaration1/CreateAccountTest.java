@@ -3,13 +3,11 @@ package UI.itaration1;
 import API.Models.UserAccount;
 import Common.Anotations.Browsers;
 import Common.Anotations.UserSession;
-import Common.Extensions.UserExtension;
 import Common.Storage.SessionStorage;
 import UI.BaseUiTest;
 import UI.Pages.UserPanel;
 import UI.Utils.Alerts;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
 

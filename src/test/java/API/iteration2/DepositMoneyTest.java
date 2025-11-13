@@ -1,5 +1,6 @@
 package API.iteration2;
 
+import API.BaseTest;
 import API.Models.CreateUserRequest;
 import API.Models.DepositMoneyRequest;
 import API.Models.DepositMoneyResponse;
@@ -18,8 +19,8 @@ import static Common.Common.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class DepositMoneyTest {
-    private static Stream<Arguments> validData() {
+public class DepositMoneyTest extends BaseTest {
+    private static Stream<Arguments> validData()  {
         return Stream.of(
                 Arguments.of("0.01 deposit", 0.01),
                 Arguments.of("5000 deposit", 5000.0),

@@ -2,24 +2,23 @@ package Common.Storage;
 
 import API.Models.CreateUserRequest;
 import API.Models.UserAccount;
-import API.skelethon.requesters.UserSteps;
 
 import java.util.*;
 
 public class AccountsStorage {
-    private static final AccountsStorage INTSTANCE = new AccountsStorage();
+    private static final ThreadLocal<AccountsStorage> INTSTANCE = ThreadLocal.withInitial(AccountsStorage::new);
     private final LinkedHashMap<UserAccount, CreateUserRequest> userAccounts = new LinkedHashMap<>();
     private AccountsStorage(){
     }
     public static void addAccount(UserAccount userAccount, CreateUserRequest createUserRequest) {
-            INTSTANCE.userAccounts.put(userAccount, createUserRequest);
+            INTSTANCE.get().userAccounts.put(userAccount, createUserRequest);
         }
 
     public static List<UserAccount> getAccounts() {
-        return new ArrayList<>(INTSTANCE.userAccounts.keySet());
+        return new ArrayList<>(INTSTANCE.get().userAccounts.keySet());
     }
 
     public static void clear() {
-        INTSTANCE.userAccounts.clear();
+        INTSTANCE.get().userAccounts.clear();
     }
 }
