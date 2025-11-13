@@ -1,4 +1,4 @@
-package API.dao.comparison;
+package DB.dao.comparison;
 
 import java.lang.reflect.Field;
 import java.util.Map;

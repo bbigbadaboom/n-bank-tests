@@ -3,9 +3,9 @@ package API.iteration1;
 import API.BaseTest;
 import API.Models.CreateUserRequest;
 import API.Models.UserAccount;
-import API.dao.AccountDao;
-import API.dao.comparison.DaoAndModelAssertions;
-import API.skelethon.Steps.DataBaseSteps;
+import DB.dao.AccountDao;
+import DB.dao.comparison.DaoAndModelAssertions;
+import DB.DataBaseSteps;
 import org.junit.jupiter.api.Test;
 import API.skelethon.Steps.AdminSteps;
 

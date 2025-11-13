@@ -1,4 +1,4 @@
-package API.dao;
+package DB.dao;
 
 public class BaseDao {
 }

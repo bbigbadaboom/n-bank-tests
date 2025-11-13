@@ -1,4 +1,4 @@
-package API.dao;
+package DB.dao;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

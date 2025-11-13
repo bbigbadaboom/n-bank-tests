@@ -1,11 +1,10 @@
-package API.skelethon.Steps;
+package DB;
 
 import API.Configs.Config;
-import API.dao.AccountDao;
-import API.dao.TablesEnum;
-import API.dao.UserDao;
-import API.database.Condition;
-import API.database.DBRequest;
+import DB.dao.AccountDao;
+import DB.dao.UserDao;
+import DB.database.Condition;
+import DB.database.DBRequest;
 import Common.helpers.StepLogger;
 
 import java.sql.Connection;
@@ -13,8 +12,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static API.dao.TablesEnum.ACCOUNTS;
-import static API.dao.TablesEnum.CUSTOMERS;
+import static DB.dao.TablesEnum.ACCOUNTS;
+import static DB.dao.TablesEnum.CUSTOMERS;
 
 public class DataBaseSteps {
 

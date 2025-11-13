@@ -1,13 +1,10 @@
-package API.database;
+package DB.database;
 
 import API.Configs.Config;
-import API.dao.AccountDao;
-import API.dao.UserDao;
 import lombok.Builder;
 import lombok.Data;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
@@ -128,15 +125,16 @@ public class DBRequest {
             return this;
         }
 
+        public DBRequestBuilder table(String table) {
+            this.table = table;
+            return this;
+        }
+
         public DBRequestBuilder where(Condition condition) {
             this.conditions.add(condition);
             return this;
         }
 
-        public DBRequestBuilder table(String table) {
-            this.table = table;
-            return this;
-        }
 
         public <T> T extractAs(Class<T> clazz) {
             this.extractAsClass = clazz;

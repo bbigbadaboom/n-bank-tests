@@ -1,4 +1,4 @@
-package API.dao;
+package DB.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

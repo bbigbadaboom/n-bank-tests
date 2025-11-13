@@ -1,7 +1,7 @@
-package API.dao.comparison;
+package DB.dao.comparison;
 
 import API.Models.BaseModel;
-import API.dao.BaseDao;
+import DB.dao.BaseDao;
 import org.assertj.core.api.AbstractAssert;
 
 public class DaoAndModelAssertions {
