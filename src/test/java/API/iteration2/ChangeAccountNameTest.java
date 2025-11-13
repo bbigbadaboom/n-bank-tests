@@ -5,20 +5,18 @@ import API.Models.CreateUserRequest;
 import API.Models.UserChangeNameRequest;
 import API.Models.UserChangeNameResponse;
 import API.Models.UserGetHisProfileResponse;
+import DB.DataBaseSteps;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import API.skelethon.requesters.AdminSteps;
-import API.skelethon.requesters.UserSteps;
+import API.skelethon.Steps.AdminSteps;
+import API.skelethon.Steps.UserSteps;
 
 import static Common.Common.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.List;
 import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 public class ChangeAccountNameTest extends BaseTest {
@@ -44,6 +42,9 @@ public class ChangeAccountNameTest extends BaseTest {
 
         UserGetHisProfileResponse customer = UserSteps.userGetHisProfile(createUserRequest.getUsername(), createUserRequest.getPassword());
         assertEquals(customer.getName(), userChangeNameRequest.getName());
+        String userDao = DataBaseSteps.getUserByUsername(createUserRequest.getUsername()).getName();
+        assertEquals(userChangeNameRequest.getName(), userDao);
+
     }
 
     @ParameterizedTest(name = "{displayName} {0}")
@@ -58,6 +59,8 @@ public class ChangeAccountNameTest extends BaseTest {
 
         UserGetHisProfileResponse getUserProfile = UserSteps.userGetHisProfile(createUserRequest.getUsername(), createUserRequest.getPassword());
         assertNull(getUserProfile.getName());
+        String userDao = DataBaseSteps.getUserByUsername(createUserRequest.getUsername()).getName();
+        assertNotEquals(userChangeNameRequest.getName(), userDao);
     }
 
 }

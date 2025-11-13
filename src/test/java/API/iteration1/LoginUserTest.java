@@ -7,9 +7,9 @@ import API.Specs.RequestSpecs;
 import API.Specs.ResponseSpecs;
 import org.junit.jupiter.api.Test;
 import API.skelethon.EndPoints;
-import API.skelethon.requesters.AdminSteps;
+import API.skelethon.Steps.AdminSteps;
 import API.skelethon.requesters.CrudRequester;
-import API.skelethon.requesters.UserSteps;
+import API.skelethon.Steps.UserSteps;
 
 import static Common.Common.*;
 

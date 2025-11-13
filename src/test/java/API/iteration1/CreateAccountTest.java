@@ -3,10 +3,13 @@ package API.iteration1;
 import API.BaseTest;
 import API.Models.CreateUserRequest;
 import API.Models.UserAccount;
+import DB.dao.AccountDao;
+import DB.dao.comparison.DaoAndModelAssertions;
+import DB.DataBaseSteps;
 import org.junit.jupiter.api.Test;
-import API.skelethon.requesters.AdminSteps;
+import API.skelethon.Steps.AdminSteps;
 
-import API.skelethon.requesters.UserSteps;
+import API.skelethon.Steps.UserSteps;
 
 
 import static Common.Common.*;
@@ -28,6 +31,8 @@ public class CreateAccountTest extends BaseTest {
                 () -> assertEquals(list.get(0).getBalance(), 0.0),
                 () -> assertTrue(list.get(0).getTransactions().isEmpty())
         );
+        AccountDao accountDao = DataBaseSteps.getAccountByAccountNumber(list.get(0).getAccountNumber());
+        DaoAndModelAssertions.assertThat(list.get(0), accountDao).match();
     }
 }
 

@@ -1,9 +1,6 @@
 package API.Models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -11,9 +8,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
 public class UserAccount extends BaseModel {
-    public int id;
-    public String accountNumber;
-    public double balance;
-    public List<Transaction> transactions;
+    private Long id;
+    private String accountNumber;
+    private double balance;
+    private List<Transaction> transactions;
 }

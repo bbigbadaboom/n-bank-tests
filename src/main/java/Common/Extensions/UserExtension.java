@@ -2,8 +2,8 @@ package Common.Extensions;
 
 import API.Models.CreateUserRequest;
 import API.Models.UserAccount;
-import API.skelethon.requesters.AdminSteps;
-import API.skelethon.requesters.UserSteps;
+import API.skelethon.Steps.AdminSteps;
+import API.skelethon.Steps.UserSteps;
 import Common.Anotations.UserSession;
 import Common.Anotations.WithAccounts;
 import Common.Storage.AccountsStorage;

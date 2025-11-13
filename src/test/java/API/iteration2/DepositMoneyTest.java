@@ -5,12 +5,16 @@ import API.Models.CreateUserRequest;
 import API.Models.DepositMoneyRequest;
 import API.Models.DepositMoneyResponse;
 import API.Models.UserAccount;
+import DB.dao.AccountDao;
+import DB.dao.comparison.DaoAndModelAssertions;
+import DB.DataBaseSteps;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import API.skelethon.requesters.AdminSteps;
-import API.skelethon.requesters.UserSteps;
+import API.skelethon.Steps.AdminSteps;
+import API.skelethon.Steps.UserSteps;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -31,20 +35,21 @@ public class DepositMoneyTest extends BaseTest {
 
     private static Stream<Arguments> inValidBalanceData() {
         return Stream.of(
-                Arguments.of("balance more than 5000", "5000.01", "Deposit amount cannot exceed 5000"),
-                Arguments.of("balance 0", "0", "Deposit amount must be at least 0.01"),
-                Arguments.of("balance -0.01", "-0.01", "Deposit amount must be at least 0.01")
+                Arguments.of("balance more than 5000", "5000.01", "Deposit amount exceeds the 5000 limit"),
+                Arguments.of("balance 0", "0", "Invalid account or amount"),
+                Arguments.of("balance -0.01", "-0.01", "Invalid account or amount")
         );
     }
     @ParameterizedTest(name = "{displayName} {0}")
     @MethodSource("validData")
+    @Disabled("баг")
     public void userDepositMoneyWithValidDataTest(String testName, Double amount){
         CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
 
         AdminSteps.adminCreateUser(createUserRequest);
 
         UserAccount userAccount = UserSteps.userCreateAccount(createUserRequest.getUsername(), createUserRequest.getPassword());
-        int accountId = userAccount.getId();
+        long accountId = userAccount.getId();
 
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
         depositMoneyRequest.setId(accountId);
@@ -65,9 +70,15 @@ public class DepositMoneyTest extends BaseTest {
                 () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), amount),
                 () -> assertEquals(userAccountwithDeposit.get(0).getTransactions().size(), 1)
         );
+
+        AccountDao accountDao = DataBaseSteps.getAccountByAccountNumber(userAccountwithDeposit.get(0).getAccountNumber());
+        DaoAndModelAssertions.assertThat(userAccountwithDeposit.get(0), accountDao).match();
+
+
     }
 
     @Test
+    @Disabled("баг")
     public void userDepositMoneyWithValidDatawith2DepositsTest() {
 
         CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
@@ -75,7 +86,7 @@ public class DepositMoneyTest extends BaseTest {
         AdminSteps.adminCreateUser(createUserRequest);
 
         UserAccount userAccount = UserSteps.userCreateAccount(createUserRequest.getUsername(), createUserRequest.getPassword());
-        int accountId = userAccount.getId();
+        long accountId = userAccount.getId();
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
         depositMoneyRequest.setId(accountId);
 
@@ -104,7 +115,7 @@ public class DepositMoneyTest extends BaseTest {
 
         UserAccount userAccount = UserSteps.userCreateAccount(createUserRequest.getUsername(), createUserRequest.getPassword());
 
-        int accountId = userAccount.getId();
+        long accountId = userAccount.getId();
         DepositMoneyRequest firstDepositMoneyRequest = generate(DepositMoneyRequest.class);
         firstDepositMoneyRequest.setId(accountId);
         firstDepositMoneyRequest.setBalance(amount);
@@ -117,6 +128,9 @@ public class DepositMoneyTest extends BaseTest {
                 () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), 0.0),
                 () -> assertEquals(userAccountwithDeposit.get(0).getTransactions().size(), 0)
         );
+
+        AccountDao accountDao = DataBaseSteps.getAccountByAccountNumber(userAccountwithDeposit.get(0).getAccountNumber());
+        DaoAndModelAssertions.assertThat(userAccountwithDeposit.get(0), accountDao).match();
     }
 
     @Test

@@ -20,7 +20,7 @@ public class DepositPage extends BasePage<DepositPage>{
 
 
 
-    public DepositPage doDeposit (int value, double balance ) {
+    public DepositPage doDeposit (long value, double balance ) {
         depButton.shouldBe(Condition.visible);
         accountChoise.parent().selectOptionByValue(String.valueOf(value));
         balanceField.setValue(String.valueOf(balance));

@@ -22,7 +22,7 @@ public class TransferPage extends BasePage<TransferPage>{
 
 
 
-    public TransferPage doTransfer (int value, double balance, int secondValue ) {
+    public TransferPage doTransfer (long value, double balance, long secondValue ) {
         accountChoise.parent().selectOptionByValue(String.valueOf(value));
         recName.setValue("No name");
         recAccount.setValue("ACC" + secondValue);

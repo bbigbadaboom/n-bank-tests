@@ -9,7 +9,7 @@ import UI.Pages.LoginPage;
 import UI.Pages.UserPanel;
 import com.codeborne.selenide.Condition;
 import org.junit.jupiter.api.Test;
-import API.skelethon.requesters.AdminSteps;
+import API.skelethon.Steps.AdminSteps;
 
 import static Common.Common.generate;
 
