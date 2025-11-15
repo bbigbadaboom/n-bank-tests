@@ -24,12 +24,12 @@ public class DepositMoneyTest extends BaseUiTest {
         DepositMoneyRequest dep = generate(DepositMoneyRequest.class);
         UserAccount userAccount = SessionStorage.getSteps().userCreateAccount();
         long accountId = userAccount.getId();
-        new UserPanel().open().doDeposit().getPage(DepositPage.class).doDeposit(accountId, dep.getBalance())
+        new UserPanel().open().doDeposit().getPage(DepositPage.class).doDeposit(accountId, dep.getAmount())
                 .checkAlert(Alerts.SUCCES_DEPOSIT);
         List<UserAccount> userAccountwithDeposit = SessionStorage.getSteps().userGetHisAccounts();
         assertAll(
                 () -> assertEquals(userAccountwithDeposit.get(0).getId(), accountId),
-                () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), dep.getBalance()),
+                () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), dep.getAmount()),
                 () -> assertEquals(userAccountwithDeposit.get(0).getTransactions().size(), 1)
         );
     }
@@ -39,10 +39,10 @@ public class DepositMoneyTest extends BaseUiTest {
     public void userCantDepositMoneyWithInvalidTest() {
         double balance = randomDouble(-10, -5);
         DepositMoneyRequest dep = generate(DepositMoneyRequest.class);
-        dep.setBalance(balance);
+        dep.setAmount(balance);
         UserAccount userAccount = SessionStorage.getSteps().userCreateAccount();
         long accountId = userAccount.getId();
-        new UserPanel().open().doDeposit().getPage(DepositPage.class).doDeposit(accountId, dep.getBalance())
+        new UserPanel().open().doDeposit().getPage(DepositPage.class).doDeposit(accountId, dep.getAmount())
                 .checkAlert(Alerts.UNSUCCES_DEPOSIT);
         List<UserAccount> userAccountwithDeposit = SessionStorage.getSteps().userGetHisAccounts();
         assertAll(

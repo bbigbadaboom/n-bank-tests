@@ -1,4 +1,4 @@
-package UI.itaration1;
+package UI.itaration;
 
 import API.Models.UserAccount;
 import Common.Anotations.Browsers;
@@ -13,7 +13,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CreateAccountTest extends BaseUiTest {
+public class CreateAccTest extends BaseUiTest {
 
     @Test
     @UserSession

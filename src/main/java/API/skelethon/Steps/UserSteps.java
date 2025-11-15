@@ -128,4 +128,18 @@ public class UserSteps {
                 .post(transferMoneyRequest);
     }
 
+    public TransferResponse transferWithFraudCheck(Long senderAccountId, Long receiverAccountId, double amount) {
+        TransferRequest transferRequest = TransferRequest.builder()
+                .senderAccountId(senderAccountId)
+                .receiverAccountId(receiverAccountId)
+                .amount(amount)
+                .description("Test transfer with fraud check")
+                .build();
+
+        return new ValidatedCrudRequester<TransferResponse>(
+                RequestSpecs.userAuthSpec(name, pass),
+                EndPoints.TRANSFER_WITH_FRAUD_CHECK,
+                ResponseSpecs.getOkStatus()).post(transferRequest);
+    }
+
 }

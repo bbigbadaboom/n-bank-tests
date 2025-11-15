@@ -42,8 +42,8 @@ public class TransferMoneyTest extends BaseTest {
         long secondAccountId = secondUserAccount.getId();
 
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-        depositMoneyRequest.setId(accountId);
-        depositMoneyRequest.setBalance(balance);
+        depositMoneyRequest.setAccountId(accountId);
+        depositMoneyRequest.setAmount(balance);
 
         UserSteps.userDepositMoney(depositMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword());
 
@@ -94,8 +94,8 @@ public class TransferMoneyTest extends BaseTest {
         long secondAccountId = secondUserAccount.getId();
 
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-        depositMoneyRequest.setId(accountId);
-        depositMoneyRequest.setBalance(balance);
+        depositMoneyRequest.setAccountId(accountId);
+        depositMoneyRequest.setAmount(balance);
 
         UserSteps.userDepositMoney(depositMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword());
 
@@ -133,8 +133,8 @@ public class TransferMoneyTest extends BaseTest {
         long accountId = userAccount.getId();
 
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-        depositMoneyRequest.setId(accountId);
-        depositMoneyRequest.setBalance(balance);
+        depositMoneyRequest.setAccountId(accountId);
+        depositMoneyRequest.setAmount(balance);
 
         UserSteps.userDepositMoney(depositMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword());
 
@@ -158,8 +158,8 @@ public class TransferMoneyTest extends BaseTest {
         long accountId = userAccount.getId();
 
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-        depositMoneyRequest.setId(accountId);
-        depositMoneyRequest.setBalance(balance);
+        depositMoneyRequest.setAccountId(accountId);
+        depositMoneyRequest.setAmount(balance);
 
         UserSteps.userDepositMoney(depositMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword());
         TransferMoneyRequest transferMoneyRequest = generate(TransferMoneyRequest .class);
@@ -185,8 +185,8 @@ public class TransferMoneyTest extends BaseTest {
         long secondAccountId = secondUserAccount.getId();
 
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-        depositMoneyRequest.setId(accountId);
-        depositMoneyRequest.setBalance(balance);
+        depositMoneyRequest.setAccountId(accountId);
+        depositMoneyRequest.setAmount(balance);
 
         repeat(3, () -> UserSteps.userDepositMoney(depositMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword()));
 
@@ -223,8 +223,8 @@ public class TransferMoneyTest extends BaseTest {
         long secondAccountId = secondUserAccount.getId();
 
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-        depositMoneyRequest.setId(accountId);
-        depositMoneyRequest.setBalance(balance);
+        depositMoneyRequest.setAccountId(accountId);
+        depositMoneyRequest.setAmount(balance);
 
         UserSteps.userDepositMoney(depositMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword());
 

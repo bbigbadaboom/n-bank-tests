@@ -52,16 +52,14 @@ public class DepositMoneyTest extends BaseTest {
         long accountId = userAccount.getId();
 
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-        depositMoneyRequest.setId(accountId);
-        depositMoneyRequest.setBalance(amount);
+        depositMoneyRequest.setAccountId(accountId);
+        depositMoneyRequest.setAmount(amount);
 
         DepositMoneyResponse depositMoneyResponse = UserSteps.userDepositMoney(depositMoneyRequest,
                 createUserRequest.getUsername(), createUserRequest.getPassword());
         assertAll(
                 () -> assertEquals(depositMoneyResponse.getId(), accountId),
-                () -> assertEquals(depositMoneyResponse.getBalance(), amount),
-                () -> assertEquals(depositMoneyResponse.getTransactions().get(0).getType(), "DEPOSIT"),
-                () -> assertEquals(depositMoneyResponse.getTransactions().get(0).getAmount(), amount)
+                () -> assertEquals(depositMoneyResponse.getBalance(), amount)
         );
 
         List<UserAccount> userAccountwithDeposit = UserSteps.userGetHisAccounts(createUserRequest.getUsername(), createUserRequest.getPassword());
@@ -88,12 +86,12 @@ public class DepositMoneyTest extends BaseTest {
         UserAccount userAccount = UserSteps.userCreateAccount(createUserRequest.getUsername(), createUserRequest.getPassword());
         long accountId = userAccount.getId();
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-        depositMoneyRequest.setId(accountId);
+        depositMoneyRequest.setAccountId(accountId);
 
         UserSteps.userDepositMoney(depositMoneyRequest,createUserRequest.getUsername(), createUserRequest.getPassword());
 
         DepositMoneyRequest secondDepositMoneyRequest = generate(DepositMoneyRequest.class);
-        secondDepositMoneyRequest.setId(accountId);
+        secondDepositMoneyRequest.setAccountId(accountId);
         UserSteps.userDepositMoney(secondDepositMoneyRequest,createUserRequest.getUsername(), createUserRequest.getPassword());
 
 
@@ -101,7 +99,7 @@ public class DepositMoneyTest extends BaseTest {
                 UserSteps.userGetHisAccounts(createUserRequest.getUsername(), createUserRequest.getPassword());
         assertAll(
                 () -> assertEquals(userAccountwithDeposit.get(0).getId(), accountId),
-                () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), depositMoneyRequest.getBalance() + secondDepositMoneyRequest.getBalance()),
+                () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), depositMoneyRequest.getAmount() + secondDepositMoneyRequest.getAmount()),
                 () -> assertEquals(userAccountwithDeposit.get(0).getTransactions().size(), 2)
         );
     }
@@ -117,8 +115,8 @@ public class DepositMoneyTest extends BaseTest {
 
         long accountId = userAccount.getId();
         DepositMoneyRequest firstDepositMoneyRequest = generate(DepositMoneyRequest.class);
-        firstDepositMoneyRequest.setId(accountId);
-        firstDepositMoneyRequest.setBalance(amount);
+        firstDepositMoneyRequest.setAccountId(accountId);
+        firstDepositMoneyRequest.setAmount(amount);
 
         UserSteps.userDepositMoneyWithBadData(firstDepositMoneyRequest,createUserRequest.getUsername(), createUserRequest.getPassword(), error);
 

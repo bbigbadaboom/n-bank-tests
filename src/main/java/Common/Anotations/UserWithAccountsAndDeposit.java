@@ -9,9 +9,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface UserSession {
-    int value() default 1;
-    int auth() default 1;
-
-    TestType test() default TestType.UI;
+public @interface UserWithAccountsAndDeposit {
+    int accounts() default 1;
+    int accFordep() default 1;
 }
