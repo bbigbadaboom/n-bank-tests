@@ -47,7 +47,7 @@ public class FraudCheckWireMockExtension implements BeforeEachCallback, AfterEac
         String body = new ObjectMapper().writeValueAsString(response);
 
         // 3. Мокаем endpoint
-        stubFor(post(urlPathMatching(config.endpoint()))
+        stubFor(post(urlPathMatching(config.endpoint())) //какой вопрос и ответ замоканы
                 .willReturn(aResponse()
                         .withStatus(config.statusCode())
                         .withHeader("Content-Type", "application/json")
@@ -58,11 +58,12 @@ public class FraudCheckWireMockExtension implements BeforeEachCallback, AfterEac
         try {
             BaseModel model = config.responseClass().getDeclaredConstructor().newInstance();
 
-            // применяем overrides
+            // применяем overrides и разбивается на key value
             for (String override : config.overrides()) {
                 String[] parts = override.split("=");
                 String field = parts[0].trim();
                 String value = parts[1].trim();
+                //проставляем поля кастя значения
 
                 Field f = model.getClass().getDeclaredField(field);
                 f.setAccessible(true);
