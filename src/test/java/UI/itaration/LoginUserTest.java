@@ -1,4 +1,4 @@
-package UI.itaration1;
+package UI.itaration;
 
 import API.Configs.Config;
 import API.Models.CreateUserRequest;

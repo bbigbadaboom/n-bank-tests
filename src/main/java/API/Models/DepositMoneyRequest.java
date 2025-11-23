@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class DepositMoneyRequest extends BaseModel {
     @NumericPattern(min = 1, max = 100)
-    private long id;
+    private long accountId;
     @NumericPattern(min = 0.01, max = 4999.99, scale = 2)
-    private double balance;
+    private double amount;
 }
