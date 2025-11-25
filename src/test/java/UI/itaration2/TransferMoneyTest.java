@@ -30,8 +30,8 @@ public class TransferMoneyTest extends BaseUiTest {
         long accountId = AccountsStorage.getAccounts().get(0).getId();
         long secondAccountId = AccountsStorage.getAccounts().get(1).getId();
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-        depositMoneyRequest.setAccountId(accountId);
-        depositMoneyRequest.setAmount(balance);
+        depositMoneyRequest.setId(accountId);
+        depositMoneyRequest.setBalance(balance);
         SessionStorage.getSteps().userDepositMoney(depositMoneyRequest);
         new UserPanel().open().doTransfer().getPage(TransferPage.class).doTransfer(accountId, amount, secondAccountId).
                 checkAlert(Alerts.SUCCES_TRANSFER);
@@ -57,8 +57,8 @@ public class TransferMoneyTest extends BaseUiTest {
         long accountId = AccountsStorage.getAccounts().get(0).getId();
         long secondAccountId = AccountsStorage.getAccounts().get(1).getId();
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-        depositMoneyRequest.setAccountId(accountId);
-        depositMoneyRequest.setAmount(balance);
+        depositMoneyRequest.setId(accountId);
+        depositMoneyRequest.setBalance(balance);
         SessionStorage.getSteps().userDepositMoney(depositMoneyRequest);
 
         new UserPanel().open().doTransfer().getPage(TransferPage.class).doTransfer(accountId, amount, secondAccountId).

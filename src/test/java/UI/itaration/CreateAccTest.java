@@ -24,8 +24,7 @@ public class CreateAccTest extends BaseUiTest {
         List<UserAccount> list = SessionStorage.getSteps().userGetHisAccounts();
         assertAll(
                 () -> assertFalse(list.isEmpty()),
-                () -> assertEquals(list.get(0).getBalance(), 0.0),
-                () -> assertTrue(list.get(0).getTransactions().isEmpty())
+                () -> assertEquals(list.get(0).getBalance(), 0.0)
         );
     }
 

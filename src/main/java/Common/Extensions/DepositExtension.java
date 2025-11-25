@@ -46,8 +46,8 @@ public class DepositExtension implements BeforeEachCallback {
                 int accNumber = anotation.accFordep();
                 long accountId = AccountsStorage.getAccounts().get(accNumber - 1).getId();
                 DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-                depositMoneyRequest.setAccountId(accountId);
-                depositMoneyRequest.setAmount(balance);
+                depositMoneyRequest.setId(accountId);
+                depositMoneyRequest.setBalance(balance);
                 SessionStorage.getSteps().userDepositMoney(depositMoneyRequest);
             }
         }

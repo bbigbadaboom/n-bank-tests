@@ -18,6 +18,14 @@ public class Config {
         }
     }
     public static String getProperties(String key) {
+        String systemValue = System.getProperty(key);
+        if (systemValue !=null) {
+            return systemValue;
+        }
+        String env = System.getenv(key.toUpperCase().replace(".", "_"));
+        if (env != null) {
+            return env;
+        }
         return INSTANCE.properties.getProperty(key);
     }
 }

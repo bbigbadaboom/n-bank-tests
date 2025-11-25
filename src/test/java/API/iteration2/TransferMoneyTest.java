@@ -27,7 +27,6 @@ public class TransferMoneyTest extends BaseTest {
         );
     }
     @Test
-    @Disabled("баг")
     public void transferMoneyBetweenUsersAccountsTest() {
         double balance = randomDouble(2000, 5001);
         double amount = randomDouble(1000, 2000);
@@ -42,8 +41,8 @@ public class TransferMoneyTest extends BaseTest {
         long secondAccountId = secondUserAccount.getId();
 
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-        depositMoneyRequest.setAccountId(accountId);
-        depositMoneyRequest.setAmount(balance);
+        depositMoneyRequest.setId(accountId);
+        depositMoneyRequest.setBalance(balance);
 
         UserSteps.userDepositMoney(depositMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword());
 
@@ -73,7 +72,6 @@ public class TransferMoneyTest extends BaseTest {
     }
 
     @Test
-    @Disabled("баг")
     public void transferMoneyBetweenDifferentUsersAccounts() {
 
         double balance = randomDouble(2000, 5001);
@@ -94,8 +92,8 @@ public class TransferMoneyTest extends BaseTest {
         long secondAccountId = secondUserAccount.getId();
 
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-        depositMoneyRequest.setAccountId(accountId);
-        depositMoneyRequest.setAmount(balance);
+        depositMoneyRequest.setId(accountId);
+        depositMoneyRequest.setBalance(balance);
 
         UserSteps.userDepositMoney(depositMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword());
 
@@ -122,7 +120,6 @@ public class TransferMoneyTest extends BaseTest {
     }
 
     @Test
-    @Disabled("баг")
     public void transferMoneyFromInvalidAccountTest() {
         double balance = randomDouble(2000, 5001);
         double amount = randomDouble(1000, 2000);
@@ -133,8 +130,8 @@ public class TransferMoneyTest extends BaseTest {
         long accountId = userAccount.getId();
 
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-        depositMoneyRequest.setAccountId(accountId);
-        depositMoneyRequest.setAmount(balance);
+        depositMoneyRequest.setId(accountId);
+        depositMoneyRequest.setBalance(balance);
 
         UserSteps.userDepositMoney(depositMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword());
 
@@ -146,7 +143,6 @@ public class TransferMoneyTest extends BaseTest {
     }
 
     @Test
-    @Disabled("баг")
     public void transferMoneyToInvalidAccountTest() {
         double balance = randomDouble(2000, 5001);
         double amount = randomDouble(1000, 2000);
@@ -158,8 +154,8 @@ public class TransferMoneyTest extends BaseTest {
         long accountId = userAccount.getId();
 
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-        depositMoneyRequest.setAccountId(accountId);
-        depositMoneyRequest.setAmount(balance);
+        depositMoneyRequest.setId(accountId);
+        depositMoneyRequest.setBalance(balance);
 
         UserSteps.userDepositMoney(depositMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword());
         TransferMoneyRequest transferMoneyRequest = generate(TransferMoneyRequest .class);
@@ -172,7 +168,6 @@ public class TransferMoneyTest extends BaseTest {
 
     @ParameterizedTest(name = "{displayName} {0}")
     @MethodSource("inValidAmountData")
-    @Disabled("баг")
     public void transferMoneywithInvalidAmountTest(String testName, Double amount, String error) {
         double balance = randomDouble(2000, 5001);
         CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
@@ -185,8 +180,8 @@ public class TransferMoneyTest extends BaseTest {
         long secondAccountId = secondUserAccount.getId();
 
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-        depositMoneyRequest.setAccountId(accountId);
-        depositMoneyRequest.setAmount(balance);
+        depositMoneyRequest.setId(accountId);
+        depositMoneyRequest.setBalance(balance);
 
         repeat(3, () -> UserSteps.userDepositMoney(depositMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword()));
 
@@ -208,7 +203,6 @@ public class TransferMoneyTest extends BaseTest {
     }
 
     @Test
-    @Disabled("баг")
     public void transferMoneywithAmountMoreThanBalanceTest() {
         double amount = randomDouble(2000, 5001);
         double balance = randomDouble(1000, 2000);
@@ -223,8 +217,8 @@ public class TransferMoneyTest extends BaseTest {
         long secondAccountId = secondUserAccount.getId();
 
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-        depositMoneyRequest.setAccountId(accountId);
-        depositMoneyRequest.setAmount(balance);
+        depositMoneyRequest.setId(accountId);
+        depositMoneyRequest.setBalance(balance);
 
         UserSteps.userDepositMoney(depositMoneyRequest, createUserRequest.getUsername(), createUserRequest.getPassword());
 

@@ -22,7 +22,7 @@ public class BaseUiTest extends BaseTest {
     @BeforeAll
     public static void setupSelenoid() {
         Configuration.remote = Config.getProperties("configuration.remote");
-        Configuration.baseUrl = Config.getProperties("configuration.baseUrl");
+        Configuration.baseUrl = Config.getProperties("baseUiUrl");
         Configuration.browser = Config.getProperties("configuration.browser");
         Configuration.browserSize = Config.getProperties("configuration.browserSize");
         Configuration.headless= true;
