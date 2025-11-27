@@ -46,10 +46,14 @@ jobs:
         env:
           BASEAPIURL: http://localhost:4111
           BASEUIURL: http://frontend
+
       - name: Build docker image
         run: |
           COMMIT_HASH=$(echo "${{ github.sha }}" | cut -c1-7)
-          docker build -t nbank-tests:$COMMIT_HASH .    
+          docker build -t nbank-tests:$COMMIT_HASH .
+
+      - name: Make push executable
+        run: chmod +x ./push-test.sh
 
       - name: Run docker push script
         run: |

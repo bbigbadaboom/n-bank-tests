@@ -1,4 +1,4 @@
-#1/bin/bash
+#!/bin/bash
 IMAGE_NAME=nbank-tests
 DOCKERHUB_USERNAME=bbigbadaboom
 TAG=${1:-latest}
