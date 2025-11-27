@@ -13,7 +13,7 @@ mkdir -p "$TEST_OUTPUT_DIR/reports"
 
 docker-compose -f $COMPOSE_FILE up -d
 
-echo ">>> Waiting for services to start..."
+echo "Ждем пока сервисы стартанут."
 sleep 5
 
 #запуск контейнера
@@ -28,8 +28,8 @@ docker run --rm \
 
  docker-compose -f $COMPOSE_FILE down
 
- echo ">>> Сервисы остановлены"
- echo ">>> Тесты завершены"
+ echo "Сервисы остановлены"
+ echo "есты завершены"
  echo "Лог файл: $TEST_OUTPUT_DIR/logs/run.log"
  echo "Результаты тестов: $TEST_OUTPUT_DIR/results"
  echo "Репорт: $TEST_OUTPUT_DIR/reports"
