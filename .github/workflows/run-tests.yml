@@ -1,0 +1,63 @@
+name: Run tests
+
+#trigger
+on:
+  push:
+    paths:
+      - "src/**"
+  workflow_dispatch:
+
+jobs:
+  run-tests:
+    name: Set up services and run tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository #copy files into ci
+        uses: actions/checkout@v4
+
+      - name: Set up Jdk
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '19'
+
+      - name: Cache maven
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build project (no tests)
+        run: mvn clean install -DskipTests
+
+      - name: Run Checkstyle
+        run: mvn checkstyle:check
+
+      - name: Set up Services
+        run: |
+            cd infra/docker_compose
+            bash restart_docker.sh
+
+      - name: Run all tests
+        run: |
+          ./mvnw test -Papi
+        env:
+          BASEAPIURL: http://localhost:4111
+          BASEUIURL: http://frontend
+
+      - name: Build docker image
+        run: |
+          COMMIT_HASH=$(echo "${{ github.sha }}" | cut -c1-7)
+          docker build -t nbank-tests:$COMMIT_HASH .
+
+      - name: Make push executable
+        run: chmod +x ./push-test.sh
+
+      - name: Run docker push script
+        run: |
+          COMMIT_HASH=$(echo "${{ github.sha }}" | cut -c1-7)
+          ./push-test.sh "$COMMIT_HASH"
+        env:
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}

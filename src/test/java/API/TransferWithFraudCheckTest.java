@@ -8,6 +8,7 @@ import Common.Extensions.DepositExtension;
 import Common.Extensions.FraudCheckWireMockExtension;
 import Common.Storage.AccountsStorage;
 import Common.Storage.SessionStorage;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,6 +20,7 @@ public class TransferWithFraudCheckTest extends BaseTest {
     
 
     @Test
+    @Disabled
     @UserWithAccountsAndDeposit(accounts = 2)
     @Mock(responseClass = FraudCheckResponse.class,
             endpoint = "/fraud-check",

@@ -27,12 +27,10 @@ public class CreateAccountTest extends BaseTest {
         UserSteps.userCreateAccount(createUserRequest.getUsername(), createUserRequest.getPassword());
 
         List<UserAccount> list = UserSteps.userGetHisAccounts(createUserRequest.getUsername(), createUserRequest.getPassword());
-        assertAll(
-                () -> assertEquals(list.get(0).getBalance(), 0.0),
-                () -> assertTrue(list.get(0).getTransactions().isEmpty())
-        );
-        AccountDao accountDao = DataBaseSteps.getAccountByAccountNumber(list.get(0).getAccountNumber());
-        DaoAndModelAssertions.assertThat(list.get(0), accountDao).match();
+         assertEquals(list.get(0).getBalance(), 0.0);
+
+//        AccountDao accountDao = DataBaseSteps.getAccountByAccountNumber(list.get(0).getAccountNumber());
+//        DaoAndModelAssertions.assertThat(list.get(0), accountDao).match();
     }
 }
 

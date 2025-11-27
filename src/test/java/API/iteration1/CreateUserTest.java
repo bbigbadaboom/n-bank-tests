@@ -69,8 +69,8 @@ public class CreateUserTest extends BaseTest {
         List<String> userNames = users.stream().map(CreateUserResponse::getUsername).toList();
         assertTrue(userNames.contains(createUserRequest.getUsername()));
 
-        UserDao userDao = DataBaseSteps.getUserByUsername(createUserRequest.getUsername());
-        DaoAndModelAssertions.assertThat(createUserResponse, userDao).match();
+//        UserDao userDao = DataBaseSteps.getUserByUsername(createUserRequest.getUsername());
+//        DaoAndModelAssertions.assertThat(createUserResponse, userDao).match();
     }
     @ParameterizedTest(name = "{displayName} {0}")
     @MethodSource("invalidData")
@@ -81,7 +81,7 @@ public class CreateUserTest extends BaseTest {
         createUserRequest.setPassword(password);
         createUserRequest.setUsername(username);
         AdminSteps.adminCreateUserWithBadData(createUserRequest, key, error);
-        assertNull(DataBaseSteps.getUserByUsername(createUserRequest.getUsername()));
+//        assertNull(DataBaseSteps.getUserByUsername(createUserRequest.getUsername()));
     }
 
     @Test

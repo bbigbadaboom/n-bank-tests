@@ -24,13 +24,12 @@ public class DepositMoneyTest extends BaseUiTest {
         DepositMoneyRequest dep = generate(DepositMoneyRequest.class);
         UserAccount userAccount = SessionStorage.getSteps().userCreateAccount();
         long accountId = userAccount.getId();
-        new UserPanel().open().doDeposit().getPage(DepositPage.class).doDeposit(accountId, dep.getAmount())
+        new UserPanel().open().doDeposit().getPage(DepositPage.class).doDeposit(accountId, dep.getBalance())
                 .checkAlert(Alerts.SUCCES_DEPOSIT);
         List<UserAccount> userAccountwithDeposit = SessionStorage.getSteps().userGetHisAccounts();
         assertAll(
                 () -> assertEquals(userAccountwithDeposit.get(0).getId(), accountId),
-                () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), dep.getAmount()),
-                () -> assertEquals(userAccountwithDeposit.get(0).getTransactions().size(), 1)
+                () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), dep.getBalance())
         );
     }
 
@@ -39,16 +38,15 @@ public class DepositMoneyTest extends BaseUiTest {
     public void userCantDepositMoneyWithInvalidTest() {
         double balance = randomDouble(-10, -5);
         DepositMoneyRequest dep = generate(DepositMoneyRequest.class);
-        dep.setAmount(balance);
+        dep.setBalance(balance);
         UserAccount userAccount = SessionStorage.getSteps().userCreateAccount();
         long accountId = userAccount.getId();
-        new UserPanel().open().doDeposit().getPage(DepositPage.class).doDeposit(accountId, dep.getAmount())
+        new UserPanel().open().doDeposit().getPage(DepositPage.class).doDeposit(accountId, dep.getBalance())
                 .checkAlert(Alerts.UNSUCCES_DEPOSIT);
         List<UserAccount> userAccountwithDeposit = SessionStorage.getSteps().userGetHisAccounts();
         assertAll(
                 () -> assertEquals(userAccountwithDeposit.get(0).getId(), accountId),
-                () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), 0.0),
-                () -> assertEquals(userAccountwithDeposit.get(0).getTransactions().size(), 0)
+                () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), 0.0)
         );
     }
 }

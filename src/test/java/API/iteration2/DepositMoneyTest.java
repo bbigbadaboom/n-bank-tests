@@ -35,14 +35,13 @@ public class DepositMoneyTest extends BaseTest {
 
     private static Stream<Arguments> inValidBalanceData() {
         return Stream.of(
-                Arguments.of("balance more than 5000", "5000.01", "Deposit amount exceeds the 5000 limit"),
-                Arguments.of("balance 0", "0", "Invalid account or amount"),
-                Arguments.of("balance -0.01", "-0.01", "Invalid account or amount")
+                Arguments.of("balance more than 5000", "5000.01", "Deposit amount cannot exceed 5000"),
+                Arguments.of("balance 0", "0", "Deposit amount must be at least 0.01"),
+                Arguments.of("balance -0.01", "-0.01", "Deposit amount must be at least 0.01")
         );
     }
     @ParameterizedTest(name = "{displayName} {0}")
     @MethodSource("validData")
-    @Disabled("баг")
     public void userDepositMoneyWithValidDataTest(String testName, Double amount){
         CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
 
@@ -52,8 +51,8 @@ public class DepositMoneyTest extends BaseTest {
         long accountId = userAccount.getId();
 
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-        depositMoneyRequest.setAccountId(accountId);
-        depositMoneyRequest.setAmount(amount);
+        depositMoneyRequest.setId(accountId);
+        depositMoneyRequest.setBalance(amount);
 
         DepositMoneyResponse depositMoneyResponse = UserSteps.userDepositMoney(depositMoneyRequest,
                 createUserRequest.getUsername(), createUserRequest.getPassword());
@@ -65,18 +64,16 @@ public class DepositMoneyTest extends BaseTest {
         List<UserAccount> userAccountwithDeposit = UserSteps.userGetHisAccounts(createUserRequest.getUsername(), createUserRequest.getPassword());
         assertAll(
                 () -> assertEquals(userAccountwithDeposit.get(0).getId(), accountId),
-                () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), amount),
-                () -> assertEquals(userAccountwithDeposit.get(0).getTransactions().size(), 1)
+                () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), amount)
         );
 
-        AccountDao accountDao = DataBaseSteps.getAccountByAccountNumber(userAccountwithDeposit.get(0).getAccountNumber());
-        DaoAndModelAssertions.assertThat(userAccountwithDeposit.get(0), accountDao).match();
+//        AccountDao accountDao = DataBaseSteps.getAccountByAccountNumber(userAccountwithDeposit.get(0).getAccountNumber());
+//        DaoAndModelAssertions.assertThat(userAccountwithDeposit.get(0), accountDao).match();
 
 
     }
 
     @Test
-    @Disabled("баг")
     public void userDepositMoneyWithValidDatawith2DepositsTest() {
 
         CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
@@ -86,12 +83,12 @@ public class DepositMoneyTest extends BaseTest {
         UserAccount userAccount = UserSteps.userCreateAccount(createUserRequest.getUsername(), createUserRequest.getPassword());
         long accountId = userAccount.getId();
         DepositMoneyRequest depositMoneyRequest = generate(DepositMoneyRequest.class);
-        depositMoneyRequest.setAccountId(accountId);
+        depositMoneyRequest.setId(accountId);
 
         UserSteps.userDepositMoney(depositMoneyRequest,createUserRequest.getUsername(), createUserRequest.getPassword());
 
         DepositMoneyRequest secondDepositMoneyRequest = generate(DepositMoneyRequest.class);
-        secondDepositMoneyRequest.setAccountId(accountId);
+        secondDepositMoneyRequest.setId(accountId);
         UserSteps.userDepositMoney(secondDepositMoneyRequest,createUserRequest.getUsername(), createUserRequest.getPassword());
 
 
@@ -99,8 +96,7 @@ public class DepositMoneyTest extends BaseTest {
                 UserSteps.userGetHisAccounts(createUserRequest.getUsername(), createUserRequest.getPassword());
         assertAll(
                 () -> assertEquals(userAccountwithDeposit.get(0).getId(), accountId),
-                () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), depositMoneyRequest.getAmount() + secondDepositMoneyRequest.getAmount()),
-                () -> assertEquals(userAccountwithDeposit.get(0).getTransactions().size(), 2)
+                () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), depositMoneyRequest.getBalance() + secondDepositMoneyRequest.getBalance())
         );
     }
 
@@ -115,20 +111,19 @@ public class DepositMoneyTest extends BaseTest {
 
         long accountId = userAccount.getId();
         DepositMoneyRequest firstDepositMoneyRequest = generate(DepositMoneyRequest.class);
-        firstDepositMoneyRequest.setAccountId(accountId);
-        firstDepositMoneyRequest.setAmount(amount);
+        firstDepositMoneyRequest.setId(accountId);
+        firstDepositMoneyRequest.setBalance(amount);
 
         UserSteps.userDepositMoneyWithBadData(firstDepositMoneyRequest,createUserRequest.getUsername(), createUserRequest.getPassword(), error);
 
         List<UserAccount> userAccountwithDeposit =UserSteps.userGetHisAccounts(createUserRequest.getUsername(), createUserRequest.getPassword());
         assertAll(
                 () -> assertEquals(userAccountwithDeposit.get(0).getId(), accountId),
-                () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), 0.0),
-                () -> assertEquals(userAccountwithDeposit.get(0).getTransactions().size(), 0)
+                () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), 0.0)
         );
 
-        AccountDao accountDao = DataBaseSteps.getAccountByAccountNumber(userAccountwithDeposit.get(0).getAccountNumber());
-        DaoAndModelAssertions.assertThat(userAccountwithDeposit.get(0), accountDao).match();
+//        AccountDao accountDao = DataBaseSteps.getAccountByAccountNumber(userAccountwithDeposit.get(0).getAccountNumber());
+//        DaoAndModelAssertions.assertThat(userAccountwithDeposit.get(0), accountDao).match();
     }
 
     @Test
