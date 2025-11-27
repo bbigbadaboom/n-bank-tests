@@ -6,7 +6,7 @@ TAG=${1:-latest}
 echo "Логин в Docker Hub с токеном"
 echo "$DOCKERHUB_TOKEN" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
 echo "Тегирование образа"
-docker tag "$IMAGE_NAME" "$DOCKERHUB_USERNAME/$IMAGE_NAME:$TAG"
+docker tag "$IMAGE_NAME:$TAG" "$DOCKERHUB_USERNAME/$IMAGE_NAME:$TAG"
 
 echo "Отправка образа в Docker Hub"
 docker push "$DOCKERHUB_USERNAME/$IMAGE_NAME:$TAG"
