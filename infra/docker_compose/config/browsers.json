@@ -1,12 +1,31 @@
 {
+  "firefox": {
+    "default": "89.0",
+    "versions": {
+      "89.0": {
+        "image": "selenoid/vnc:firefox_89.0",
+        "port": "4444",
+        "path": "/wd/hub"
+      }
+    }
+  },
   "chrome": {
     "default": "91.0",
     "versions": {
       "91.0": {
-        "image": "dumbdumbych/selenium_vnc_chrome_arm64:91.0.b",
+        "image": "selenoid/vnc:chrome_91.0",
         "port": "4444",
-        "path": "/",
-        "privileged": true
+        "path": "/"
+      }
+    }
+  },
+  "opera": {
+    "default": "76.0",
+    "versions": {
+      "76.0": {
+        "image": "selenoid/vnc:opera_76.0",
+        "port": "4444",
+        "path": "/wd/hub"
       }
     }
   }
