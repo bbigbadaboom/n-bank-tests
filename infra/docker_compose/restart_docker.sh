@@ -1,4 +1,4 @@
-#!/bin/bash
+  #!/bin/bash
 
 echo ">>> Остановить Docker Compose"
 docker compose down
