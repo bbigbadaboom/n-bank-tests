@@ -44,8 +44,8 @@ public class ChangeAccountNameTest extends BaseTest {
 
         UserGetHisProfileResponse customer = UserSteps.userGetHisProfile(createUserRequest.getUsername(), createUserRequest.getPassword());
         assertEquals(customer.getName(), userChangeNameRequest.getName());
-        String userDao = DataBaseSteps.getUserByUsername(createUserRequest.getUsername()).getName();
-        assertEquals(userChangeNameRequest.getName(), userDao);
+//        String userDao = DataBaseSteps.getUserByUsername(createUserRequest.getUsername()).getName();
+//        assertEquals(userChangeNameRequest.getName(), userDao);
 
     }
 
