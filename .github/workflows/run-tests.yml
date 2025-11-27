@@ -36,3 +36,4 @@ jobs:
         env:
           BASEAPIURL: http://localhost:4111
           BASEUIURL: http://localhost:3000
+          CONFIGURATION_REMOTE: http://localhost:4444/wd/hub
