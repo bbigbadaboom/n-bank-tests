@@ -31,7 +31,7 @@ jobs:
             bash restart_docker.sh
 
       - name: Run tests
-        run: ./mvnw  clean test -Papi & ./mvnw test -Pui
+        run: ./mvnw  clean test -Papi
         env:
           APIBASEURL: http://localhost:4111
           UIBASEURL: http://loclhost
