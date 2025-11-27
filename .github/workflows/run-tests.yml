@@ -26,7 +26,9 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Set up Services
-        run: bash restart_docker.sh
+        run: |
+            cd infra/docker_compose
+            bash restart_docker.sh
 
       - name: Run tests
         run: ./mvnw  clean test -Papi & ./mvnw test -Pui
