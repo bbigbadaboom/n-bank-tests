@@ -1,7 +1,7 @@
 #1/bin/bash
 IMAGE_NAME=nbank-tests
 DOCKERHUB_USERNAME=bbigbadaboom
-TAG=latest
+TAG=${1:-latest}
 #вынесли токен в переменну окружения export DOCKERHUB_TOKEN=
 echo "Логин в Docker Hub с токеном"
 echo "$DOCKERHUB_TOKEN" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin

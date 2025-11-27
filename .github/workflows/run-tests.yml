@@ -1,7 +1,11 @@
 name: Run tests
 
 #trigger
-on: [push, workflow_dispatch]
+on:
+  push:
+    paths:
+      - "src/**"
+  workflow_dispatch:
 
 jobs:
   run-tests:
@@ -25,6 +29,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
+      - name: Build project (no tests)
+        run: mvn clean install -DskipTests
+
+      - name: Run Checkstyle
+        run: mvn checkstyle:check
+
       - name: Set up Services
         run: |
             cd infra/docker_compose
@@ -32,7 +42,14 @@ jobs:
 
       - name: Run all tests
         run: |
-          ./mvnw test -Pui
+          ./mvnw test -Papi
         env:
           BASEAPIURL: http://localhost:4111
           BASEUIURL: http://frontend
+
+      - name: Run docker push script
+        run: |
+          COMMIT_HASH=$(echo "${{ github.sha }}" | cut -c1-7)
+          scripts/push_docker.sh "$COMMIT_HASH"
+        env:
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
