@@ -30,8 +30,10 @@ jobs:
             cd infra/docker_compose
             bash restart_docker.sh
 
-      - name: Run tests
-        run: ./mvnw  clean test -Papi
+      - name: Run all tests
+        run: |
+          ./mvnw clean test -Papi
+          ./mvnw test -Pui
         env:
           APIBASEURL: http://localhost:4111
-          UIBASEURL: http://loclhost
+          UIBASEURL: http://frontend
