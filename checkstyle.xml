@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/configuration_1_2.dtd">
+
+<module name="Checker">
+
+    <!-- Показывать путь в отчётах -->
+    <property name="localeLanguage" value="en"/>
+
+    <!-- Базовые проверки -->
+    <module name="TreeWalker">
+
+        <!-- Проверка названий классов -->
+        <module name="TypeName"/>
+
+<!--        &lt;!&ndash; Проверка названий методов &ndash;&gt;-->
+<!--        <module name="MethodName"/>-->
+
+<!--        &lt;!&ndash; Проверка названий переменных &ndash;&gt;-->
+<!--        <module name="LocalVariableName"/>-->
+
+<!--        &lt;!&ndash; Проверка лишних импортов &ndash;&gt;-->
+<!--        <module name="UnusedImports"/>-->
+
+<!--        &lt;!&ndash; Проверка пустых блоков */-->
+<!--        <module name="EmptyBlock"/>-->
+
+<!--        &lt;!&ndash; Проверка длины файла &ndash;&gt;-->
+<!--        <module name="FileLength">-->
+<!--            <property name="max" value="2000"/>-->
+<!--        </module>-->
+
+<!--        &lt;!&ndash; Проверка длины строки &ndash;&gt;-->
+<!--        <module name="LineLength">-->
+<!--            <property name="max" value="160"/>-->
+<!--        </module>-->
+
+    </module>
+
+</module>

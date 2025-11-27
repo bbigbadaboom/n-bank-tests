@@ -50,6 +50,6 @@ jobs:
       - name: Run docker push script
         run: |
           COMMIT_HASH=$(echo "${{ github.sha }}" | cut -c1-7)
-          scripts/push_docker.sh "$COMMIT_HASH"
+          ./push_docker.sh "$COMMIT_HASH"
         env:
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}

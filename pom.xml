@@ -127,7 +127,7 @@
                 </executions>
                 <configuration>
                     <failOnViolation>true</failOnViolation>
-                    <configLocation>google_checks.xml</configLocation>
+                    <configLocation>checkstyle.xml</configLocation>
                 </configuration>
             </plugin>
     </plugins>
