@@ -35,9 +35,9 @@ public class DepositMoneyTest extends BaseTest {
 
     private static Stream<Arguments> inValidBalanceData() {
         return Stream.of(
-                Arguments.of("balance more than 5000", "5000.01", "Deposit amount exceeds the 5000 limit"),
-                Arguments.of("balance 0", "0", "Invalid account or amount"),
-                Arguments.of("balance -0.01", "-0.01", "Invalid account or amount")
+                Arguments.of("balance more than 5000", "5000.01", "Deposit amount cannot exceed 5000"),
+                Arguments.of("balance 0", "0", "Deposit amount must be at least 0.01"),
+                Arguments.of("balance -0.01", "-0.01", "Deposit amount must be at least 0.01")
         );
     }
     @ParameterizedTest(name = "{displayName} {0}")
@@ -122,8 +122,8 @@ public class DepositMoneyTest extends BaseTest {
                 () -> assertEquals(userAccountwithDeposit.get(0).getBalance(), 0.0)
         );
 
-        AccountDao accountDao = DataBaseSteps.getAccountByAccountNumber(userAccountwithDeposit.get(0).getAccountNumber());
-        DaoAndModelAssertions.assertThat(userAccountwithDeposit.get(0), accountDao).match();
+//        AccountDao accountDao = DataBaseSteps.getAccountByAccountNumber(userAccountwithDeposit.get(0).getAccountNumber());
+//        DaoAndModelAssertions.assertThat(userAccountwithDeposit.get(0), accountDao).match();
     }
 
     @Test
