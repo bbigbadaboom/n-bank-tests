@@ -27,5 +27,4 @@ public class CreateAccTest extends BaseUiTest {
                 () -> assertEquals(list.get(0).getBalance(), 0.0)
         );
     }
-
 }
