@@ -75,7 +75,6 @@ public class CrudRequester extends HttpRequester implements CrudInterface, Speci
                     .then()
                     .assertThat()
                     .spec(responseSpecification);
-
         });
 
     }
