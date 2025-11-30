@@ -16,4 +16,5 @@ public class AccountDao extends BaseDao {
     private String account_number;
     private Double balance;
     private Long customerId;
+
 }
