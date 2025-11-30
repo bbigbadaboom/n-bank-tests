@@ -1,5 +1,6 @@
 package API.skelethon.requesters;
 
+import API.Configs.Config;
 import API.Models.BaseModel;
 import API.skelethon.interfaces.CrudInterface;
 import API.skelethon.interfaces.SpecialCruds;
@@ -13,6 +14,7 @@ import API.skelethon.HttpRequester;
 import static io.restassured.RestAssured.given;
 
 public class CrudRequester extends HttpRequester implements CrudInterface, SpecialCruds {
+    private final String APIVERSION = Config.getProperties("apiVersion");
     public CrudRequester(RequestSpecification requestSpecification, EndPoints endPoint, ResponseSpecification responseSpecification) {
         super(requestSpecification, endPoint, responseSpecification);
     }
@@ -24,7 +26,7 @@ public class CrudRequester extends HttpRequester implements CrudInterface, Speci
                     .spec(requestSpecification)
                     .body(baseModel)
                     .when()
-                    .post(endPoint.getUrl())
+                    .post(APIVERSION + endPoint.getUrl())
                     .then()
                     .assertThat()
                     .spec(responseSpecification);
@@ -37,7 +39,7 @@ public class CrudRequester extends HttpRequester implements CrudInterface, Speci
             return given()
                     .spec(requestSpecification)
                     .when()
-                    .get(endPoint.getUrl())
+                    .get(APIVERSION + endPoint.getUrl())
                     .then()
                     .assertThat()
                     .spec(responseSpecification);
@@ -51,7 +53,7 @@ public class CrudRequester extends HttpRequester implements CrudInterface, Speci
                     .spec(requestSpecification)
                     .body(baseModel)
                     .when()
-                    .put(endPoint.getUrl())
+                    .put(APIVERSION + endPoint.getUrl())
                     .then()
                     .assertThat()
                     .spec(responseSpecification);
@@ -69,7 +71,7 @@ public class CrudRequester extends HttpRequester implements CrudInterface, Speci
             return given()
                     .spec(requestSpecification)
                     .when()
-                    .post(endPoint.getUrl())
+                    .post(APIVERSION + endPoint.getUrl())
                     .then()
                     .assertThat()
                     .spec(responseSpecification);
