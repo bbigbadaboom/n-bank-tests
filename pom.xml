@@ -177,6 +177,9 @@
                 </plugins>
                 <resources>
                     <resource>
+                        <directory>src/main/resources</directory>
+                    </resource>
+                    <resource>
                         <directory>src/test/resources</directory>
                         <includes>
                             <include>api-junit-platform.properties</include>
@@ -222,6 +225,9 @@
                     </plugin>
                 </plugins>
                 <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                    </resource>
                     <resource>
                         <directory>src/test/resources</directory>
                         <includes>
