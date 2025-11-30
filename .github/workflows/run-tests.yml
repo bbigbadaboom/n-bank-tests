@@ -42,7 +42,7 @@ jobs:
 
       - name: Run all tests
         run: |
-          ./mvnw test -Papi
+          ./mvnw clean test -Papi
         env:
           BASEAPIURL: http://localhost:4111
           BASEUIURL: http://frontend
