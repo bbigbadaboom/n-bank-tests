@@ -18,7 +18,6 @@ public class AdminSteps {
         return StepLogger.log("Admin create user",  () -> {
             return new ValidatedCrudRequester<CreateUserResponse>(RequestSpecs.adminAuthSpec(), EndPoints.POST_ADMIN_USER, ResponseSpecs.entityCreated())
                     .post(createUserRequest);
-
         });
     }
     public static String adminCreateUserWithMistake(CreateUserRequest createUserRequest) {
