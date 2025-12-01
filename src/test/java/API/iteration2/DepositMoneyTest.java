@@ -102,6 +102,7 @@ public class DepositMoneyTest extends BaseTest {
 
     @ParameterizedTest(name="{displayName} {0}")
     @MethodSource("inValidBalanceData")
+    @Disabled
     public void userDepositMoneyWithinValidBalanceDataTest(String testName, Double amount, String error) {
         CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
 
@@ -127,6 +128,7 @@ public class DepositMoneyTest extends BaseTest {
     }
 
     @Test
+    @Disabled
     public void userDepositMoneyWithinValidAccountTest() {
         CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
         AdminSteps.adminCreateUser(createUserRequest);

@@ -47,9 +47,24 @@ jobs:
           BASEAPIURL: http://localhost:4111
           BASEUIURL: http://frontend
 
+#          Прогнали тесты → собрали Allure результаты
+#
+#          Собрали swagger coverage
+#
+#          Подтянули историю прошлых отчётов
+#
+#          Собрали новый отчет
+#
+#          Добавили туда swagger отчёт
+#
+#          Опубликовали на GitHub Pages
+
       - name: Run Swagger coverage
         if: always()
         run: .swagger-coverage-commandline/bin/swagger-coverage-commandline -s http://localhost:4111/v3/api-docs -i target/swagger-coverage-output
+      - name: Check API coverage
+        if: always()
+        run: bash checkCover.sh
 
       - name: Load test report history
         uses: actions/checkout@v2
@@ -83,17 +98,17 @@ jobs:
         run: cd infra/docker_compose && docker compose down
 
 
-#      - name: Build docker image
-#        run: |
-#          COMMIT_HASH=$(echo "${{ github.sha }}" | cut -c1-7)
-#          docker build -t nbank-tests:$COMMIT_HASH .
-#
-#      - name: Make push executable
-#        run: chmod +x ./push-test.sh
-#
-#      - name: Run docker push script
-#        run: |
-#          COMMIT_HASH=$(echo "${{ github.sha }}" | cut -c1-7)
-#          ./push-test.sh "$COMMIT_HASH"
-#        env:
-#          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build docker image
+        run: |
+          COMMIT_HASH=$(echo "${{ github.sha }}" | cut -c1-7)
+          docker build -t nbank-tests:$COMMIT_HASH .
+
+      - name: Make push executable
+        run: chmod +x ./push-test.sh
+
+      - name: Run docker push script
+        run: |
+          COMMIT_HASH=$(echo "${{ github.sha }}" | cut -c1-7)
+          ./push-test.sh "$COMMIT_HASH"
+        env:
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}

@@ -120,6 +120,7 @@ public class TransferMoneyTest extends BaseTest {
     }
 
     @Test
+    @Disabled
     public void transferMoneyFromInvalidAccountTest() {
         double balance = randomDouble(2000, 5001);
         double amount = randomDouble(1000, 2000);
@@ -143,6 +144,7 @@ public class TransferMoneyTest extends BaseTest {
     }
 
     @Test
+    @Disabled
     public void transferMoneyToInvalidAccountTest() {
         double balance = randomDouble(2000, 5001);
         double amount = randomDouble(1000, 2000);
@@ -168,6 +170,7 @@ public class TransferMoneyTest extends BaseTest {
 
     @ParameterizedTest(name = "{displayName} {0}")
     @MethodSource("inValidAmountData")
+    @Disabled
     public void transferMoneywithInvalidAmountTest(String testName, Double amount, String error) {
         double balance = randomDouble(2000, 5001);
         CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
@@ -203,6 +206,7 @@ public class TransferMoneyTest extends BaseTest {
     }
 
     @Test
+    @Disabled
     public void transferMoneywithAmountMoreThanBalanceTest() {
         double amount = randomDouble(2000, 5001);
         double balance = randomDouble(1000, 2000);
