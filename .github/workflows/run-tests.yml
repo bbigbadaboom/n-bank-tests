@@ -63,9 +63,6 @@ jobs:
         if: always()
         run: .swagger-coverage-commandline/bin/swagger-coverage-commandline -s http://localhost:4111/v3/api-docs -i target/swagger-coverage-output
 
-      - name: Make script executable
-        run: chmod +x ./checkСover.sh
-
       - name: Check API coverage
         if: always()
         run: bash checkCover.sh

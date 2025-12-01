@@ -60,7 +60,6 @@ public class CreateUserTest extends BaseTest {
         CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
 
         CreateUserResponse createUserResponse = AdminSteps.adminCreateUser(createUserRequest);
-
         assertAll(
                 () -> assertThatModels(CreateUserRequest.class, CreateUserResponse.class),
                 () -> assertNotEquals(createUserResponse.getPassword(), createUserRequest.getPassword())
