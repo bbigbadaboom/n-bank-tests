@@ -58,7 +58,6 @@ public class CreateUserTest extends BaseTest {
     @Disabled
     public void adminCanCreateUserWithCorrectDataTest() {
         CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
-
         CreateUserResponse createUserResponse = AdminSteps.adminCreateUser(createUserRequest);
         assertAll(
                 () -> assertThatModels(CreateUserRequest.class, CreateUserResponse.class),
