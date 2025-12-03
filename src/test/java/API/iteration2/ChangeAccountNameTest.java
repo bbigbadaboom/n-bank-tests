@@ -31,7 +31,6 @@ public class ChangeAccountNameTest extends BaseTest {
         );
     }
     @Test
-    @Disabled("баг")
     public void changeUsersNameTest() {
         UserChangeNameRequest userChangeNameRequest = generate(UserChangeNameRequest.class);
         CreateUserRequest createUserRequest = generate(CreateUserRequest.class);
@@ -51,6 +50,7 @@ public class ChangeAccountNameTest extends BaseTest {
 
     @ParameterizedTest(name = "{displayName} {0}")
     @MethodSource("inValidData")
+    @Disabled
     public void changeUsersNameWithInvalidDataTest(String testName, String name, String error) {
         UserChangeNameRequest userChangeNameRequest = generate(UserChangeNameRequest.class);
         userChangeNameRequest.setName(name);

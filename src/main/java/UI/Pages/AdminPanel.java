@@ -1,5 +1,6 @@
 package UI.Pages;
 
+import Common.helpers.StepLogger;
 import UI.UiElements.UserPage;
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
@@ -30,8 +31,10 @@ public class AdminPanel extends BasePage<AdminPanel> {
     }
 
     public List<UserPage> getAllUsers() {
-        ElementsCollection elementsCollection = $(Selectors.byText("All Users")).parent().findAll("li");
-        return generatePageElements(elementsCollection, UserPage::new);
+        return StepLogger.log("GET all users from dashboard",  () -> {
+            ElementsCollection elementsCollection = $(Selectors.byText("All Users")).parent().findAll("li");
+            return generatePageElements(elementsCollection, UserPage::new);
+        });
     }
 
     public Optional<UserPage> findUser(String name) {

@@ -3,6 +3,9 @@ package API.Specs;
 import API.Configs.Config;
 import API.Models.CreateUserRequest;
 import API.Models.LoginUserRequest;
+import com.github.viclovsky.swagger.coverage.FileSystemOutputWriter;
+import com.github.viclovsky.swagger.coverage.SwaggerCoverageRestAssured;
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
@@ -11,9 +14,12 @@ import io.restassured.specification.RequestSpecification;
 import API.skelethon.EndPoints;
 import API.skelethon.requesters.CrudRequester;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.github.viclovsky.swagger.coverage.SwaggerCoverageConstants.OUTPUT_DIRECTORY;
 
 public class RequestSpecs {
     private RequestSpecs(){
@@ -25,8 +31,12 @@ public class RequestSpecs {
                 .setContentType(ContentType.JSON)
                 .setAccept(ContentType.JSON)
                 .addFilters(List.of(new RequestLoggingFilter(),
-                        new ResponseLoggingFilter()))
-                .setBaseUri(Config.getProperties("baseApiUrl") + Config.getProperties("apiVersion"));
+                        new ResponseLoggingFilter(),
+                        new AllureRestAssured(),
+                        new SwaggerCoverageRestAssured(
+                                new FileSystemOutputWriter(Paths.get("target/" + OUTPUT_DIRECTORY)) // сохраняем результаты покрытия в файл
+                        )))
+                .setBaseUri(Config.getProperties("baseApiUrl"));
     }
     public static RequestSpecification unAuthSpec(){
         return defaultRequestBuilder().build();

@@ -82,6 +82,11 @@
             <version>42.7.3</version>
         </dependency>
         <dependency>
+            <groupId>com.github.viclovsky</groupId>
+            <artifactId>swagger-coverage-rest-assured</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.wiremock</groupId>
             <artifactId>wiremock-standalone</artifactId>
             <version>3.4.2</version>
@@ -149,14 +154,43 @@
                             </includes>
                         </configuration>
                     </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <copy file="src/test/resources/api-junit-platform.properties"
+                                              tofile="${project.build.testOutputDirectory}/junit-platform.properties"
+                                              overwrite="true"/>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                    </resource>
+                    <resource>
+                        <directory>src/test/resources</directory>
+                        <includes>
+                            <include>api-junit-platform.properties</include>
+                        </includes>
+                        <filtering>false</filtering>
+                    </resource>
+                </resources>
             </build>
-            <properties>
-                <junit.platform.properties.file>src/test/resources/api-junit-platform.properties</junit.platform.properties.file>
-            </properties>
         </profile>
         <profile>
-            <id>ui</id>
+            <id>uii</id>
             <build>
                 <plugins>
                     <plugin>
@@ -169,11 +203,40 @@
                             </includes>
                         </configuration>
                     </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <copy file="src/test/resources/ui-junit-platform.properties"
+                                              tofile="${project.build.testOutputDirectory}/junit-platform.properties"
+                                              overwrite="true"/>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                    </resource>
+                    <resource>
+                        <directory>src/test/resources</directory>
+                        <includes>
+                            <include>ui-junit-platform.properties</include>
+                        </includes>
+                        <filtering>false</filtering>
+                    </resource>
+                </resources>
             </build>
-            <properties>
-                <junit.platform.properties.file>src/test/resources/ui-junit-platform.properties</junit.platform.properties.file>
-            </properties>
         </profile>
     </profiles>
 

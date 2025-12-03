@@ -8,6 +8,8 @@ import Common.Extensions.BrowsersExtension;
 import Common.Extensions.TimingExtension;
 import Common.Extensions.UserExtension;
 import com.codeborne.selenide.Configuration;
+import com.codeborne.selenide.logevents.SelenideLogger;
+import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -27,5 +29,6 @@ public class BaseUiTest extends BaseTest {
         Configuration.browserSize = Config.getProperties("configuration.browserSize");
         Configuration.headless= true;
         Configuration.browserCapabilities.setCapability("selenoid:options", Map.of("enableVNC", true, "enableLog", true));
+        SelenideLogger.addListener("AllureSelenide", new AllureSelenide());
     }
 }

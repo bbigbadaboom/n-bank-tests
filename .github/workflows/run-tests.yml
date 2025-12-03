@@ -42,10 +42,62 @@ jobs:
 
       - name: Run all tests
         run: |
-          ./mvnw test -Papi
+          ./mvnw clean test -Papi
         env:
           BASEAPIURL: http://localhost:4111
           BASEUIURL: http://frontend
+
+#          Прогнали тесты → собрали Allure результаты
+#
+#          Собрали swagger coverage
+#
+#          Подтянули историю прошлых отчётов
+#
+#          Собрали новый отчет
+#
+#          Добавили туда swagger отчёт
+#
+#          Опубликовали на GitHub Pages
+
+      - name: Run Swagger coverage
+        if: always()
+        run: .swagger-coverage-commandline/bin/swagger-coverage-commandline -s http://localhost:4111/v3/api-docs -i target/swagger-coverage-output
+
+      - name: Check API coverage
+        if: always()
+        run: bash checkCover.sh
+
+      - name: Load test report history
+        uses: actions/checkout@v2
+        if: always()
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Build test report
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          gh_pages: gh-pages
+          allure_results: target/allure-results
+          allure_history: allure-history
+
+      - name: Build Swagger coverage report
+        if: always()
+        run: sudo cp swagger-coverage-report.html allure-history/${{ github.run_number }}
+
+      - name: Publish test report
+        uses: peaceiris/actions-gh-pages@v3
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
+
+      - name: Clean up services
+        if: always()
+        run: cd infra/docker_compose && docker compose down
+
 
       - name: Build docker image
         run: |
